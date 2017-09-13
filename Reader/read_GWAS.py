@@ -9,14 +9,21 @@ log_file.flush()
 df_buffer = dict()
 filename = str()
 file_nm = 0
-replacement_headers = {'additional information about the data': 'info', 'strand of DNA': 'strand',
-                           'control group data': 'controls', 'case group data': 'case',
-                           'samplesize': 'N', 'HWE value': 'HWE', 'P-value' : 'P', 'effect size or '
-                           'beta': 'Beta', 'RAF': 'RAF', 'EAF': 'EAf', 'MAF': 'MAF', 'CAF': 'CAF',
-                           'other allele or minor allele' : 'Otherallele', 'Major allele or effect allele':
-                           'Majorallele', 'position or location of SNP': 'BP', 'chromosome nr': 'CHR',
-                           'rsID of marker or SNP': 'MarkerOriginal'}
-
+#RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
+#RAF EAF MAF CAF
+replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
+                       'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
+                       'effect allele frequency': 'EAf', 'major allele frequency': 'RAF',
+                       'non-effect allele frequency' : 'CAF', 'minor allele frequency': 'MAF', 'effect/risk allele':
+                       'effect_allele', 'major allele': 'major_allele', 'non-effect allele': "non_effect_allele",
+                       'minor allele': 'minor_allele', 'position or location of SNP': 'BP', 'chromosome number': 'CHR',
+                       'rsID of marker or SNP': 'MarkerOriginal'}
+header_info = [['rsID of marker or SNP', 1], ['chromosome number', 2], ['location of SNP', 3],
+               ['strand orientation', 4], ['effect allele', 5], ['major allele', 6], ['non-effect allele', 7],
+               ['minor allele', 8], ['effect allele frequency', 9], ['major allele frequency', 10],
+               ['non-effect allele frequency', 11], ['minor allele frequency', 12], ['effect size or Beta', 13],
+               ['standard error', 14], ['P-value', 15], ['case samplesize', 16], ['control samplesize', 17],
+               ['additional info', 18]]
 header_dict = {''}
 
 def get_path(dir, fpath):
@@ -206,53 +213,65 @@ def column_unifier(df):
 
     new_columns = df.columns.values
     global replacement_headers
-    headers_list = list(replacement_headers.keys())
-    print("len headers: ", len(headers_list))
+    global header_info
+
+    print("len headers: ", len(header_info))
 
     for i, header in enumerate(headers):
-        print_table(headers_list)
+        print_table()
         print(df[[header]][0:5])
-        print("Please type the number of the corresponding description of the information in this column. "\
-              "If the description is not available, then it's not relevent, type: N")
+        print("Please type the number of the corresponding description of the information in this column. "
+              "If the description is not available, then it's not relevant, type: N")
         try_again = True
         while try_again:
             cor_nm = str(input())
             if cor_nm.isdigit():
-                headers[i] = replacement_headers.get(headers_list[int(cor_nm)])
+                headers[i] = replacement_headers.get(header_info[int(cor_nm)-1][0])
                 try_again = False
             elif cor_nm.upper() == "N":
                 try_again = False
             else:
                 "Seems like you failed to type a number, please try again"
             print('If you made a mistake press any key for the following input, else: press ENTER')
-            user_done = input()
-            if not user_done:
-                try_again = False
+            not_done = input()
+            if not_done:
+                try_again = True
+                print("Please type the number of the corresponding description of the information in this column. "
+                      "If the description is not available, then it's not relevant, type: N")
 
 
     df_buffer['new_columns'] = new_columns
+    print(df.columns.values)
 
     with pd.option_context('max_rows',10):
         print(df)
 
     getsomeBEDs(df)
 
-def print_table(headers_list):
+def print_table():
 
-    iter_headers = iter(headers_list)
+    global header_info
+
+    iter_headers = iter(header_info)
     for i, item in enumerate(iter_headers):
         try:
-            print('{}\t{}|{}\t{}'.format(str(i + 1), item.ljust(40), str(i + 9), next(iter_headers).ljust(40)))
+            if True:
+                next_item = next(iter_headers)
+                print('{}\t{}|{}\t{}'.format(item[1], item[0].ljust(40), str(next_item[1]), next_item[0].ljust(40)))
+            else:
+                print('{}\t{}|').format(str(item[1]), item[0].ljust(40))
         except AttributeError:
-            if item:
-                print('{}\t{}|').format(str(i + 1), item.ljust(40))
+            print("attribute error")
+
         except StopIteration:
-            print("\n")
+            print("stop iteration")
+    print("\n")
 
 def getsomeBEDs(df):
 
-    rs_col = df["markername"].tolist()
-    print(rs_col)
+    # rs_col = df["markername"].tolist()
+    # print(rs_col)
+    pass
 
 
 def check_correct():

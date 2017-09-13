@@ -2,3 +2,36 @@ not chunked, to check sep
 entering check sep
 valid seperator found: ;
 entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: ;
+entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: ;
+entering column_unifier
+entering check sep
+valid seperator found: 	
+entering column_unifier
+entering check sep
+valid seperator found: 	
+entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: ;
+entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: 	
+entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: 	
+entering column_unifier
+not chunked, to check sep
+entering check sep
+valid seperator found: ;
+entering column_unifier
+entering check sep
+valid seperator found: 	
+entering column_unifier
