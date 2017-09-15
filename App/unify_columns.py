@@ -2,12 +2,12 @@
 #RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
 #RAF EAF MAF CAF
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
-                       'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
-                       'effect allele frequency': 'EAf', 'major allele frequency': 'RAF',
-                       'non-effect allele frequency' : 'CAF', 'minor allele frequency': 'MAF', 'effect/risk allele':
-                       'effect_allele', 'major allele': 'major_allele', 'non-effect allele': "non_effect_allele",
-                       'minor allele': 'minor_allele', 'position or location of SNP': 'BP', 'chromosome number': 'CHR',
-                       'rsID of marker or SNP': 'marker_original'}
+                   'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
+                   'effect allele frequency': 'EAf', 'major allele frequency': 'JAF',
+                   'non-effect allele frequency' : 'NAF', 'minor allele frequency': 'MAF', 'effect/risk allele':
+                   'effect_allele', 'major allele': 'major_allele', 'non-effect allele': "non_effect_allele",
+                   'minor allele': 'minor_allele', 'position or location of SNP': 'BP', 'chromosome number': 'CHR',
+                   'rsID of marker or SNP': 'marker_original'}
 header_info = [['rsID of marker or SNP', 1], ['chromosome number', 2], ['location of SNP', 3],
                ['strand orientation', 4], ['effect allele', 5], ['major allele', 6], ['non-effect allele', 7],
                ['minor allele', 8], ['effect allele frequency', 9], ['major allele frequency', 10],

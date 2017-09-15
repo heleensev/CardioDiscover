@@ -100,5 +100,7 @@ ENV/
 # mypy
 .mypy_cache/
 
-# large liftover files
+# bigass large files
 /Datasets/LiftOver
+/Datasets/GWAS/cad.add.160614.complete.website.txt
+/App/cad_rs.csv

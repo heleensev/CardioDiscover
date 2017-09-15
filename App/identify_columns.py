@@ -3,24 +3,25 @@ import re
 import App.check_correct as checker
 import App.global_functions as glob
 
+allele_cnt = 0
+
 def init_header_ider():
     header_ider()
 
 def header_ider():
-    
-    replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
-                       'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
-                       'effect allele frequency': 'EAf', 'major allele frequency': 'RAF',
-                       'non-effect allele frequency' : 'CAF', 'minor allele frequency': 'MAF', 'effect/risk allele':
-                       'effect_allele', 'major allele': 'major_allele', 'non-effect allele': "non_effect_allele",
-                       'minor allele': 'minor_allele', 'position or location of SNP': 'BP', 'chromosome number': 'CHR',
-                       'rsID of marker or SNP': 'marker_original'}
 
+#([(?p<bp>)(?p<pos>)(?p<loc>)]($|[ _-]))?(hg(\d){2})?(grch(\d){2})*
+#EAF: effect allele freq, NAF: non-effect allele freq, JAF: major allele freq, MAF: minor allele freq    
+    col_types = [['marker_original', '(snp)*(marker(name)*)*(rs(id))*', '[0-9]*'], 
+                 ['CHR', '(ch(r)?(omosome)?)', '[1-22]?[XY]?'],
+                 ['BP', '(((pos)|(loc)|(bp))($)|([ _-]))?(hg(\d){2})?(grch(\d){2})*', '\d*$'], 
+                 ['allele', '(allele)?(A([12_-]|$))?[12]?','[ACTGDI]'],
+                 ['Beta','(beta)?(effect)?(OR)?', '\d*\.\d\?*(E)?-?\d*'], 
+                 ['SE', '(se)?(std)?', '\d*\.\d\?*(E)?-?\d*'], 
+                 ['sample', '((n[ _-]?)$)?(studies)?(case)?', '[0-10000]'],
+                 ['control', 'control', '[0-10000]'],
+                 ['info', 'info', '\w']]
     
-    col_types = ['rs_id', 'chr_id', 'loc_id', 'allele_id', 'beta_id', 'pval_id', 'sample_id', 'info_id']
-    col_types = [
-    if not headers:
-        headers, col = df.columns
     for i, header in enumerate(headers):
         df = glob.filetodf(cols=i)
         while True:
@@ -29,57 +30,62 @@ def header_ider():
                     break
             break
 
-def col_id(df, 
 
-def rs_id(df, head= False, col= False):
-    
+def rs_id(df, rehead, recol, head= False, col= False):
+    allele = None
+                 
     if df.headers:
-        hdPattern = re.compile(r'(snp)*(marker(name)*)*(rs(id))*', re.I)
-        if hdPattern:
+        header = df.headers
+        hdPattern = re.compile(r'{}'.format(rehead), re.I)
+        if hdPattern.match(header):
+            if 'allele' in rehead:
+                 allele_type(df)
             head = True
     cnt -= 0
-    rsPattern = re.compile(r'[0-9]*')
+    colPattern = re.compile(r'{}'.format(recol), re.I)
     for row in df.tolist():
-        if rsPattern.match:
+        if colPattern.match(row):
             cnt += 1
-    if cnt <
+    if cnt > 14:
+        col = True
 
     if head or col:
-        return True
+        checker.
+        return True, allele
+    
+    else:
+         return False, allele
+                 
+def allele_type():
+    
+    header = df.columns
+    head_type = None
+                 
+    #allele_types = [['effect_allele', '(effect)?(ef)?(risk)?','[ACTGDI]'],
+    #                ['non_effect_allele ','non[-_ ]effect', '[ACTGDI]'] 
+    #                ['major_allele', 'major', '[ATCDGI]'], 
+    #                ['minor_allele', 'minor', '[ATCDGI]'],
+    #                ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
+    #                ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],
+    #                ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*']] 
+    
+    allele_types = [['effect_allele', '((effect)|(ef)|(risk))|(non[-_ ]effect)|(major)|(minor))','[ACTGDI]'],
+                    ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
+                    ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],
+                    ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*']] 
+    if allele_cnt < 1:
+        alPattern = re.compile(r'{}'.format(al_type[0][0]), re.I)
+        match = alPattern.match(header)
+            if match:
+                if match.group(1):
+                    head_type = 'effect'
+                elif match.group(2)
+                    pass
+                    
+            
+    allele_cnt += 1
+                 
+                 
         
-
-def chr_id(df, head= False, col= False):
- 
-    if df.headers:
-        hdPattern = re.compile(r'ch(r)*(omosome)*', re.I)
-         if hdPattern.match(df.header):
-            head = True
-    chrPattern = re.compile(r'(1-21)[XY]*', re.I)
-    if chrPattern.match:
-        col = True
-        
-    if head or col: 
-        return True
-    
-def loc_id(df,head= False, col= False):
-    
-    if df.headers:
-        hdattern = re.compile(r'(loc)*(pos*)*(bp)*(hg)*(grch(\d){2})*', re.I)
-        if hdPattern.match:
-            head = True
-    locPattern = re.compile(r'\d*$')
-    if 
-    
-def allele_id():
-
-def beta_id():
-                 
-def pval_id():
-                 
-                 
-def sample_id():
-                 
-
-def info_id():
         
         

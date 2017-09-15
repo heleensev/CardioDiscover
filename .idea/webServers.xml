@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="830b1cb8-eb9b-43f2-8d8a-f5f18c042f5d" name="HPC" url="http://hpcsubmit.op.umcutrecht.nl">
+        <fileTransfer host="hpcsubmit.op.umcutrecht.nl" port="22" rootFolder="/home/dhl_ec/hseverin/CardioDiscover" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
