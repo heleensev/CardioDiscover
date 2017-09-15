@@ -35,3 +35,11 @@ entering column_unifier
 entering check sep
 valid seperator found: 	
 entering column_unifier
+entering check sep
+valid seperator found: 	
+entering check sep
+valid seperator found: 	
+entering check sep
+valid seperator found: 	
+entering check sep
+valid seperator found: 	
