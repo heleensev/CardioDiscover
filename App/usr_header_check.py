@@ -1,6 +1,9 @@
 import App.identify_columns as column_IDer
+import App.global_class as glob
+import App.init as init
 #RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
 #RAF EAF MAF CAF
+log = init.log
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
                    'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
                    'effect allele frequency': 'EAf', 'major allele frequency': 'JAF',
@@ -20,28 +23,14 @@ def init_usr_check(file):
     headers = column_unifier(file)
     column_IDer.check_essential(headers)
 
-def filetodf(chsize):
-    global filename
-
-    sep = df_buffer.get('separator')
-    print("sep: {}".format(sep))
-    for i, df in enumerate(pd.read_csv(filename, sep= sep, header=0, chunksize=chsize)):
-        #column_unifier(df)
-        if i == 0:
-            column_unifier()
-
-    #getsomeBEDs(chunk)
-
-    print("done reading df")
-
-def column_unifier(df):
-    log_file.write("entering column_unifier\n")
+def column_unifier(file):
+    log.write("entering column_unifier\n")
 
     skip = input("Skip column check? Y/N\n")
     while True:
         if skip.upper() == "N":
             
-            df = filetodf(5000)
+            df = file.file_to_df(chsize=5)
             headers = df.columns.values
             # global file_nm
             # print("file name: {}\nThe headers of this file are: ".format(str(all_files[file_nm])))

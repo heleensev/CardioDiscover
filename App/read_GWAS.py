@@ -1,25 +1,31 @@
+import App.global_class as glob
+import App.init as init
 import re, os
 
 df_buffer = dict()
 filename = str()
 file_nm = 0
-
+log = init.log
 all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
-
 def init_reader():
-    global log_file
+    log.write("entering read_GWAS\n")
 
     selected_file = input_prompt()
-    check_sep(selected_file)
+    sep = check_sep(selected_file)
+
+    input_file = glob.UncheckedFile(selected_file, sep)
+
+    return input_file, filename
+
 
 def get_path(fdir, fpath):
+
     fpath = fdir+fpath
     return os.path.join(os.path.dirname(__file__), fpath)
 
 
 def input_prompt():
-
     for i, file in enumerate(all_files):
         print(file)
 
@@ -30,8 +36,8 @@ def input_prompt():
     
     return file
 
-def parse_input(user_input):
 
+def parse_input(user_input):
     selected_files = list()
 
     for num in user_input:
@@ -55,10 +61,10 @@ def open_file(file):
             print("file does not contain newlines, that's not going to work")
             exit(1)
 
+
 def check_sep(file):
-    
     header_line = open_file(file)
-    log_file.write("entering check sep\n")
+    log.write("entering check sep\n")
     b = {}
 
     separators = re.findall(r"\W", header_line)
@@ -75,11 +81,11 @@ def check_sep(file):
     max_cnt = max(cnts)
     if max_cnt > 5:
         sep = seps[cnts.index(max_cnt)]
-        log_file.write("valid seperator found: " + sep + "\n")
+        log.write("valid seperator found: " + sep + "\n")
         #add seperator to df_buffer (dictionary) in case of chuncked file
         df_buffer['separator'] = sep
         #file_to_df(lines)
-        return file, sep
+        return sep
     else:
         print("no valid separator found")
         exit(1)

@@ -1,7 +1,7 @@
 #Module for automatic check on datatypes in the individual columns
 import re
 import App.check_correct as checker
-import App.global_functions as glob
+import App.global_class as glob
 import App.usr_header_check as usr_check
 
 allele_cnt = 0
@@ -16,14 +16,14 @@ def init_column_IDer(file):
 
 def header_IDer(file):
     # noinspection PyTypeChecker
-    col_types = [['marker_original', '(snp)*(marker(name)*)*(rs(id))*', '((rs)[ _-]?)?\d+'],
+    col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
                  ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
                  ['BP', '(((pos)|(loc)|(bp))($)|([ _-]))?(hg(\d){2})?(grch(\d){2})*', '\d+'],
-                 ['effect_allele', '((effect)|(ef)|(risk))', '[ATCGDI]{1}'],
-                 ['non_effect_allele', 'non[-_ ]effect', '[ATCGDI]{1}'],
+                 ['effect_allele', '((effect)|(ef)|(risk)|(aff)', '[ATCGDI]{1}'],
+                 ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ATCGDI]{1}'],
                  ['major_allele', 'major', '[ATCGDI]{1}'],
                  ['minor_allele', 'minor', '[ATCGDI]{1}']
-                 ['allele', '(allele)?(A([12_-]|$))?[12]?','[ACTGDI]{1}'],
+                 ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?','[ACTGDI]{1}'],
                  ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'], 
                  ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
                  ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],  
@@ -32,12 +32,13 @@ def header_IDer(file):
                  ['sample', '((n[ _-]?)$)?(studies)?(case)?', '[0-10000]'],
                  ['P', 'p([ _-])?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
                  ['control', 'control', '[0-10000]'],
-                 ['info', 'info', '\w']]
+                 ['info', '(info)|(annot)', '\w']]
+    #hope python knows this is an class object
+    df = file.file_to_df(chsize=6)
 
-    df = glob.filetodf(file, 6)
     headers = df.headers.values.tolist()
     for i, header in enumerate(headers):
-        df = glob.filetodf(cols=i)
+        df = file.filetodf(cols=i)
         while True:
             for c, col in enumerate(col_types):
                 if col_check(df):
