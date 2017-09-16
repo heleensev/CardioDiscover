@@ -1,4 +1,4 @@
-
+import App.identify_columns as column_IDer
 #RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
 #RAF EAF MAF CAF
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
@@ -16,8 +16,9 @@ header_info = [['rsID of marker or SNP', 1], ['chromosome number', 2], ['locatio
                ['additional info', 18]]
 header_dict = {''}
 
-def init_unify_columns(file):
-    column_unifier(file)
+def init_usr_check(file):
+    headers = column_unifier(file)
+    column_IDer.check_essential(headers)
 
 def filetodf(chsize):
     global filename

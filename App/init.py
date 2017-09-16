@@ -1,15 +1,15 @@
+import App.global_functions as glob
 import App.read_GWAS as reader
-import App.unify_columns as unifier
+import App.identify_columns as column_IDer
 import App.check_correct as checker
 import App.rs_liftover
 
 
-log_file = open("log.txt", 'a')
-
 def main():
-
-    file, df_buffer = reader.init_reader(log_file)
-    df_buffer = unifier.init_unify_columns(file, df_buffer)
+    glob.globals()
+    file, sep = reader.init_reader(log_file)
+    headers = column_IDer.init_header_ider(file, sep)
+    df = checker(file, headers)
     #checker.init_check_correct(file, df_buffer)
     
     log_file.close()

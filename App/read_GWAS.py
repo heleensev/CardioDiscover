@@ -1,9 +1,5 @@
-import pandas as pd
-from io import StringIO
-from pyliftover import liftover
 import re, os
 
-log_file
 df_buffer = dict()
 filename = str()
 file_nm = 0
@@ -11,13 +7,14 @@ file_nm = 0
 all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
 
-def init_reader(log):
-    global log_file = log
-    selected_file = input_prompt()
-    check_sep(file)
+def init_reader():
+    global log_file
 
-def get_path(dir, fpath):
-    fpath = dir+fpath
+    selected_file = input_prompt()
+    check_sep(selected_file)
+
+def get_path(fdir, fpath):
+    fpath = fdir+fpath
     return os.path.join(os.path.dirname(__file__), fpath)
 
 
@@ -51,22 +48,18 @@ def open_file(file):
     global filename
     filename = file
     with open(filename) as fin:
-        header = fin.readline()
-        check_sep(header)
-
+        header = fin.readline(500)
+        if header:
+            return header
+        else:
+            print("file does not contain newlines, that's not going to work")
+            exit(1)
 
 def check_sep(file):
     
-    header = open_file(file
+    header_line = open_file(file)
     log_file.write("entering check sep\n")
     b = {}
-
-    split_lines = lines.split("\n")
-
-    if len(split_lines) == 1:
-        print("Your file doesnt contain newlines, too bad, but that's not gonna work")
-        return
-    header_line = split_lines[0]
 
     separators = re.findall(r"\W", header_line)
 
@@ -86,17 +79,10 @@ def check_sep(file):
         #add seperator to df_buffer (dictionary) in case of chuncked file
         df_buffer['separator'] = sep
         #file_to_df(lines)
-        df_operations()
+        return file, sep
     else:
         print("no valid separator found")
-
-
-
-
-
-
-
-
+        exit(1)
 
 
 
@@ -108,5 +94,3 @@ def check_sep(file):
     # for location in dflist:
     #     print(lo.convert_coordinate('chr1', location))
 
-
-main()
