@@ -1,7 +1,7 @@
 #Module for automatic check on datatypes in the individual columns
 import re
 import App.check_correct as checker
-import App.global_class as glob
+import App.config as glob
 
 allele_cnt = 0
 

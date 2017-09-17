@@ -1,15 +1,16 @@
-import App.global_class as glob
-import App.init as init
+import logging
+from App import glob
+import App.__main__ as init
 import re, os
 
 df_buffer = dict()
 filename = str()
 file_nm = 0
-log = init.log
+logger = logging.getLogger(__name__)
 all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
 def init_reader():
-    log.write("entering read_GWAS\n")
+    #logger.log
 
     selected_file = input_prompt()
     sep = check_sep(selected_file)

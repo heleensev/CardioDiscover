@@ -1,13 +1,12 @@
 #Module for automatic check on datatypes in the individual columns
 import re
 import App.check_correct as checker
-import App.global_class as glob
-import App.usr_header_check as usr_check
-
+import App.config as glob
+import App.usr_classify_columns as usr_check
 allele_cnt = 0
 
 
-def init_column_IDer(file):
+def init_classifier(file):
     headers, df = header_IDer(file)
     headers = check_essential(headers, file)
 

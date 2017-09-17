@@ -1,6 +1,6 @@
-import App.identify_columns as column_IDer
-import App.global_class as glob
-import App.init as init
+import App.classify_columns as column_IDer
+import App.config as glob
+import App.__main__ as init
 #RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
 #RAF EAF MAF CAF
 log = init.log

@@ -1,13 +1,27 @@
-#global functions use throughout the program
+#global objects and classes use throughout the program
 import pandas as pd
+import logging
 
-class LogFile:
-    def __init__(self):
-        self.logfile = open("log_CardioDiscover.txt", "a")
-    def close(self):
-        self.logfile.close()
+logging_config = dict(
+            version=1,
+            formatters={
+                'f': {'format':
+                          '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+            },
+            handlers={
+                'h': {'class': 'logging.StreamHandler',
+                      'formatter': 'f',
+                      'level': logging.DEBUG}
+            },
+            root={
+                'handlers': ['h'],
+                'level': logging.DEBUG,
+            },
+                )
 
 
+
+#Global classes available throughout the program
 class UncheckedFile:
     def __init__(self, filename, sep):
         self.filename = filename

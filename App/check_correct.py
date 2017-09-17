@@ -1,5 +1,5 @@
 #check datatypes in all columns
-import App.global_class as glob
+import App.config as glob
 import pandas as pd
 import re
 
