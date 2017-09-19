@@ -1,9 +1,8 @@
-import App.classify_columns as column_IDer
-import App.config as glob
-import App.__main__ as init
+import logging
+
 #RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
 #RAF EAF MAF CAF
-log = init.log
+logger = logging.getLogger(__name__)
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
                    'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
                    'effect allele frequency': 'EAf', 'major allele frequency': 'JAF',
@@ -21,10 +20,10 @@ header_dict = {''}
 
 def init_usr_check(file):
     headers = column_unifier(file)
-    column_IDer.check_essential(headers)
+    return headers
 
 def column_unifier(file):
-    log.write("entering column_unifier\n")
+    logger.info("entering column_unifier\n")
 
     skip = input("Skip column check? Y/N\n")
     while True:
@@ -32,13 +31,13 @@ def column_unifier(file):
             
             df = file.file_to_df(chsize=5)
             headers = df.columns.values
+            usr_headers = []
             # global file_nm
             # print("file name: {}\nThe headers of this file are: ".format(str(all_files[file_nm])))
             # for i, header in enumerate(headers):
             #     print("{}\t{}\n".format(str(i),header))
 
-
-            new_columns = df.columns.values
+            new_headers = df.columns.values
             global replacement_headers
             global header_info
 
@@ -53,7 +52,7 @@ def column_unifier(file):
                 while try_again:
                     cor_nm = str(input())
                     if cor_nm.isdigit():
-                        headers[i] = replacement_headers.get(header_info[int(cor_nm)-1][0])
+                        new_headers[i] = replacement_headers.get(header_info[int(cor_nm)-1][0])
                         try_again = False
                     elif cor_nm.upper() == "N":
                         try_again = False
@@ -66,9 +65,9 @@ def column_unifier(file):
                         print("Please type the number of the corresponding description of the information in this column. "
                               "If the description is not available, then it's not relevant, type: N")
 
-
-            df_buffer['new_columns'] = new_columns
             print(df.columns.values)
+
+            return new_headers
 
             # with pd.option_context('max_rows',10):
             #     print(df)
@@ -77,8 +76,6 @@ def column_unifier(file):
         else:
             print("Y or N please\n")
 
-
-    get_some_rss(df)
 
 def print_table():
 
@@ -99,6 +96,7 @@ def print_table():
             print("stop iteration")
     print("\n")
 
+
 def getsomeBEDs(df):
 
     # rs_col = df["markername"].tolist()
@@ -112,11 +110,3 @@ def get_some_rss(df):
     df[rscol].to_csv("cad_rs.csv", index=False, mode='a')
 
 
-def check_correct(df):
-    log_file.write("entering check correct\n")
-
-    rs_col = df['Markername']
-
-
-
-    pass

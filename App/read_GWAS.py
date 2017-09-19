@@ -1,7 +1,6 @@
-import logging
+import os, re, logging
 from App import glob
-import App.__main__ as init
-import re, os
+
 
 df_buffer = dict()
 filename = str()
@@ -10,14 +9,14 @@ logger = logging.getLogger(__name__)
 all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
 def init_reader():
-    #logger.log
+    logger.info("Entering read_GWAS")
 
     selected_file = input_prompt()
     sep = check_sep(selected_file)
 
-    input_file = glob.UncheckedFile(selected_file, sep)
+    InputFile = glob.UncheckedFile(selected_file, sep)
 
-    return input_file, filename
+    return InputFile
 
 
 def get_path(fdir, fpath):
@@ -65,7 +64,7 @@ def open_file(file):
 
 def check_sep(file):
     header_line = open_file(file)
-    log.write("entering check sep\n")
+    logger.info("entering check sep\n")
     b = {}
 
     separators = re.findall(r"\W", header_line)
@@ -82,7 +81,7 @@ def check_sep(file):
     max_cnt = max(cnts)
     if max_cnt > 5:
         sep = seps[cnts.index(max_cnt)]
-        log.write("valid seperator found: " + sep + "\n")
+        logger.info("valid seperator found: " + sep + "\n")
         #add seperator to df_buffer (dictionary) in case of chuncked file
         df_buffer['separator'] = sep
         #file_to_df(lines)

@@ -1,19 +1,24 @@
 #Module for automatic check on datatypes in the individual columns
-import re
-import App.check_correct as checker
-import App.config as glob
-import App.usr_classify_columns as usr_check
-allele_cnt = 0
+import re, logging
+from App import checker
+from App import usr_check
+logger = logging.getLogger(__name__)
+MutableFile = object()
+header_num = int()
+identical = 0
 
 
-def init_classifier(file):
-    headers, df = header_IDer(file)
-    headers = check_essential(headers, file)
+def init_classifier(InputFile):
+    global MutableFile
+    MutableFile = InputFile
+    headers, dispose = header_IDer(InputFile)
+    headers = check_essential(headers, InputFile)
+    #set new attribute headers, and columns to skip
+    MutableFile.headers = headers
+    MutableFile.skip = dispose
 
-    return headers
 
-
-def header_IDer(file):
+def header_IDer(InputFile):
     # noinspection PyTypeChecker
     col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
                  ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
@@ -33,43 +38,73 @@ def header_IDer(file):
                  ['control', 'control', '[0-10000]'],
                  ['info', '(info)|(annot)', '\w']]
     #hope python knows this is an class object
-    df = file.file_to_df(chsize=6)
+    df = InputFile.file_to_df(chsize=1)
+    headers = df.columns.values
+    global header_num
+    header_num = len(headers)
+    dispose = list()
 
-    headers = df.headers.values.tolist()
+    #retourneer originele headers, check of er headers in het input bestand staan, en dan?
     for i, header in enumerate(headers):
-        df = file.filetodf(cols=i)
+        df = InputFile.filetodf(cols=i, chsize=25)
         while True:
             for c, col in enumerate(col_types):
-                if col_check(df):
+                if col_check(df, col[1], col[2]):
+                    #if header is already in the headers list (for header in headers list except current header)
                     if col[0] in [x for i, x in enumerate(headers) if i != c]:
-                        continue
-                    if col[0] == 'allele':
-                        if 'A1' in headers:
-                            headers[i] = 'A2'
-                        elif 'A2'in headers:
-                            continue
+                        #if that duplicate header is "allele"
+                        if col[0] == 'allele' and 'A2' not in headers:
+                            if 'A1' in headers:
+                                headers[i] = 'A2'
+                            else:
+                                headers[i] = 'A1'
+                        # if duplicate header is not allele, let user check the columns
                         else:
-                            headers[i] = 'A1'
+                            headers = usr_check.init_usr_check(InputFile)
+                            headers = check_essential(headers, InputFile)
+                            return headers
                     headers[i] = col[0]
-                    break
+                else:
+                    dispose.append(i)
             break
 
-    return headers, df
+    return headers, dispose
+
+
+def identical_increment():
+    # count occurrences of identical patterns for header and values
+    # implies headers are missing from the input file
+    global MutableFile
+    global identical
+    identical += 1
+    # if the total occurrences are more than 5, set headers to None, set names to a list filled with zeroes
+    # these attributes of the UncheckedFile object, used to read the dataframe correctly in 'check_correct'
+    if identical > 5:
+        MutableFile.headers = None
+        MutableFile.names = [0 for i in range(header_num)]
 
 
 def col_check(df, rehead, recol, head= False, col= False):
-    if df.headers:
-        header = df.headers
-        hdPattern = re.compile(r'{}'.format(rehead), re.I)
-        if hdPattern.match(header):
-            head = True
-    cnt = 0
+
+    header = df.columns.values.tolist()
+    hdPattern = re.compile(r'{}'.format(rehead), re.I)
     colPattern = re.compile(r'(\s)*{}(\s)*'.format(recol), re.I)
+
+    # if 20 of 25 values match the column pattern, the type is confirmed
+    cnt = 0
     for row in df.tolist():
         if colPattern.match(row):
             cnt += 1
     if cnt > 20:
         col = True
+    # if the column header matches the header pattern, the header is confirmed
+    if hdPattern.match(header):
+        head = True
+    # if the type is confirmed, but not the header, header may actually  be a row value
+    # implies headers are missing from the input file, call identical_increment to count occurrences
+    elif col and colPattern.match(header):
+        identical_increment()
+    # if header or column matches with the pattern, header is confirmed
     if head or col:
         checker(df, head)
         return True
@@ -81,8 +116,8 @@ def check_essential(headers, file):
     required = ['marker_original', 'CHR', 'BP', '(effect)|(major)|(A1)',
                 '(non_effect)|(minor)|(A2)', 'freq', 'Beta', 'P']
 
-    match = False
     for req in required:
+        match = False
         for head in headers:
             hdPattern = re.compile(r'{}'.format(req))
             if hdPattern.match(head):
@@ -90,9 +125,8 @@ def check_essential(headers, file):
         if not match:
             #if essential header is not identified, user input is required
             headers = usr_check.init_usr_check(file)
+            check_essential(headers, file)
             break
-        else:
-            match = False
 
     return headers
 

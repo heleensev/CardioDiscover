@@ -1,24 +1,27 @@
 #check datatypes in all columns
-import App.config as glob
-import pandas as pd
-import re
+import re, logging
+from App import glob
 
-def init_check_correct(file):
-    
-    type_checker(file)
-    
-def type_checker(file):
-    #provide filename
-    filename = file.filename
-    checked_file = glob.CheckedFile(filename)
+logger = logging.getLogger(__name__)
 
-    df = file.filetodf(file, chsize=5)
-    headers = df.columns.headers
-    for head in headers:
-        df = file.filetodf(file, cols=head)
+def init_check_correct(InputFile):
+    type_checker(InputFile)
+
+
+def type_checker(InputFile):
+    # get filename from old (UncheckedFile) file object
+    filename = InputFile.filename
+    # set headers in classify_columns
+    headers = InputFile.headers
+    # create new file object, contains attributes for the processed output file
+    CheckedFile = glob.CheckedFile(filename)
+
+    disposed = InputFile.disposed
+    # for header in headers of InputFile except for the disposed columns
+    for head in [x for i,x in enumerate(headers) if i not in disposed]:
+        df = InputFile.file_to_df(cols=head)
         df = check_vals(df, head)
-        checked_file.writedf_to_file(col=df, header=head)
-
+        CheckedFile.writedf_to_file(df, header=head)
 
 
 def check_vals(df, head):
