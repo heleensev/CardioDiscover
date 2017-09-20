@@ -39,8 +39,8 @@ class UncheckedFile:
         headers = self.headers
         names = self.names
         print("sep: {}".format(sep))
-        df = pd.read_csv(filename, sep=sep, header=headers, names=names, chunksize=chsize, usecols=cols)
-        return df
+        for df in pd.read_csv(filename, header=headers, names=names, sep=sep, chunksize=chsize, usecols=cols):
+            return df
 
 class CheckedFile:
     def __init__(self, filename, dispose):

@@ -1,7 +1,7 @@
 #Module for automatic check on datatypes in the individual columns
 import re, logging
-from App import checker
-from App import usr_check
+import pandas as pd
+import App
 logger = logging.getLogger(__name__)
 MutableFile = object()
 header_num = int()
@@ -26,8 +26,8 @@ def header_IDer(InputFile):
                  ['effect_allele', '((effect)|(ef)|(risk)|(aff)', '[ATCGDI]{1}'],
                  ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ATCGDI]{1}'],
                  ['major_allele', 'major', '[ATCGDI]{1}'],
-                 ['minor_allele', 'minor', '[ATCGDI]{1}']
-                 ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?','[ACTGDI]{1}'],
+                 ['minor_allele', 'minor', '[ATCGDI]{1}'],
+                 ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}'],
                  ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'], 
                  ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
                  ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],  
@@ -37,8 +37,18 @@ def header_IDer(InputFile):
                  ['P', 'p([ _-])?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
                  ['control', 'control', '[0-10000]'],
                  ['info', '(info)|(annot)', '\w']]
+
+    def allele_check():
+        if 'A1' in headers:
+            headers[i] = 'A2'
+        else:
+            headers[i] = 'A1'
+        return
     #hope python knows this is an class object
     df = InputFile.file_to_df(chsize=1)
+    # if df == pd.DataFrame:
+    #     print("true")
+    # elif df.size
     headers = df.columns.values
     global header_num
     header_num = len(headers)
@@ -46,21 +56,20 @@ def header_IDer(InputFile):
 
     #retourneer originele headers, check of er headers in het input bestand staan, en dan?
     for i, header in enumerate(headers):
-        df = InputFile.filetodf(cols=i, chsize=25)
+        print(i)
+        df = InputFile.file_to_df(cols=[i], chsize=25)
+        header = df.columns.values.tolist()[0]
         while True:
             for c, col in enumerate(col_types):
-                if col_check(df, col[1], col[2]):
+                if col_check(df, header, col[1], col[2]):
                     #if header is already in the headers list (for header in headers list except current header)
                     if col[0] in [x for i, x in enumerate(headers) if i != c]:
                         #if that duplicate header is "allele"
                         if col[0] == 'allele' and 'A2' not in headers:
-                            if 'A1' in headers:
-                                headers[i] = 'A2'
-                            else:
-                                headers[i] = 'A1'
+                            allele_check()
                         # if duplicate header is not allele, let user check the columns
                         else:
-                            headers = usr_check.init_usr_check(InputFile)
+                            headers = App.usr_check.init_usr_check(InputFile)
                             headers = check_essential(headers, InputFile)
                             return headers
                     headers[i] = col[0]
@@ -84,15 +93,15 @@ def identical_increment():
         MutableFile.names = [0 for i in range(header_num)]
 
 
-def col_check(df, rehead, recol, head= False, col= False):
+def col_check(df, header, rehead, recol, head= False, col= False):
 
-    header = df.columns.values.tolist()
     hdPattern = re.compile(r'{}'.format(rehead), re.I)
     colPattern = re.compile(r'(\s)*{}(\s)*'.format(recol), re.I)
 
     # if 20 of 25 values match the column pattern, the type is confirmed
     cnt = 0
-    for row in df.tolist():
+    for row in df.itertuples():
+        row = str(row[0])
         if colPattern.match(row):
             cnt += 1
     if cnt > 20:
@@ -106,7 +115,7 @@ def col_check(df, rehead, recol, head= False, col= False):
         identical_increment()
     # if header or column matches with the pattern, header is confirmed
     if head or col:
-        checker(df, head)
+        #checker(df, head)
         return True
     else:
         return False
@@ -124,7 +133,7 @@ def check_essential(headers, file):
                 match = True
         if not match:
             #if essential header is not identified, user input is required
-            headers = usr_check.init_usr_check(file)
+            headers = App.usr_check.init_usr_check(file)
             check_essential(headers, file)
             break
 

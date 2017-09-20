@@ -9,8 +9,6 @@ from App import checker
 
 def main():
 
-    pass
-
     #dictConfig(config.logging_config)
     InputFile = reader.init_reader()
     #do something with headers, write to df or something
@@ -19,4 +17,4 @@ def main():
 
 # if __name__ == '__main__':
 #     # execute only if run as the entry point into the program
-#     main()
+main()
