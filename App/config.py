@@ -2,26 +2,6 @@
 import logging
 import pandas as pd
 
-
-logging_config = dict(
-            version=1,
-            formatters={
-                'f': {'format':
-                          '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
-            },
-            handlers={
-                'h': {'class': 'logging.StreamHandler',
-                      'formatter': 'f',
-                      'level': logging.DEBUG}
-            },
-            root={
-                'handlers': ['h'],
-                'level': logging.DEBUG,
-            },
-                )
-
-
-
 #Global classes available throughout the program
 class UncheckedFile:
     def __init__(self, filename, sep):
@@ -55,3 +35,22 @@ class CheckedFile:
         self.file = col[header].to_csv(filename, index=False, mode='a')
 
         pass
+
+
+logging_config = dict(
+
+    version=1,
+    formatters={
+        'f': {'format':
+                  '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}
+    },
+    handlers={
+        'h': {'class': 'logging.StreamHandler',
+              'formatter': 'f',
+              'level': logging.DEBUG}
+    },
+    root={
+        'handlers': ['h'],
+        'level': logging.DEBUG,
+    },
+)

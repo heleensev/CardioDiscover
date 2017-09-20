@@ -7,6 +7,24 @@ MutableFile = object()
 header_num = int()
 identical = 0
 
+col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
+             ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
+             ['BP', '(((pos)|(loc)|(bp))($)|([ _-]))?(hg(\d){2})?(grch(\d){2})*', '\d+'],
+             ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ATCGDI]{1}'],
+             ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ATCGDI]{1}'],
+             ['major_allele', 'major', '[ATCGDI]{1}'],
+             ['minor_allele', 'minor', '[ATCGDI]{1}'],
+             ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}'],
+             ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'],
+             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
+             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],
+             ['Beta', '(beta)|(effect)|(OR)', '\d*\.\d\?*(E)?-?\d*'],
+             ['SE', '(se)|(std)', '\d*\.\d\?*(E)?-?\d*'],
+             ['sample', '((n[ _-]?)$)|(studies)|(case)', '[0-10000]'],
+             ['P', 'p([ _-])?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
+             ['control', 'control', '[0-10000]']]
+             #['info', '(info)|(annot)', '\w']]
+
 
 def init_classifier(InputFile):
     global MutableFile
@@ -19,37 +37,31 @@ def init_classifier(InputFile):
 
 
 def header_IDer(InputFile):
-    # noinspection PyTypeChecker
-    col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
-                 ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
-                 ['BP', '(((pos)|(loc)|(bp))($)|([ _-]))?(hg(\d){2})?(grch(\d){2})*', '\d+'],
-                 ['effect_allele', '((effect)|(ef)|(risk)|(aff)', '[ATCGDI]{1}'],
-                 ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ATCGDI]{1}'],
-                 ['major_allele', 'major', '[ATCGDI]{1}'],
-                 ['minor_allele', 'minor', '[ATCGDI]{1}'],
-                 ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}'],
-                 ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'], 
-                 ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
-                 ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],  
-                 ['Beta', '(beta)?(effect)?(OR)?', '\d*\.\d\?*(E)?-?\d*'],
-                 ['SE', '(se)?(std)?', '\d*\.\d\?*(E)?-?\d*'], 
-                 ['sample', '((n[ _-]?)$)?(studies)?(case)?', '[0-10000]'],
-                 ['P', 'p([ _-])?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
-                 ['control', 'control', '[0-10000]'],
-                 ['info', '(info)|(annot)', '\w']]
 
     def allele_check():
+        # check if allele is already added to the headers list
         if 'A1' in headers:
             headers[i] = 'A2'
         else:
             headers[i] = 'A1'
-        return
+
+    def duplicate_check(headers):
+        # if header is already in the headers list (for header in headers list except current header)
+        if col[0] in [x for i, x in enumerate(headers) if i != c]:
+            # if that duplicate header is "allele"
+            if col[0] == 'allele' and 'A2' not in headers:
+                allele_check(headers)
+            # if duplicate header is not allele, let user check the columns
+            else:
+                headers = App.usr_check.init_usr_check(InputFile)
+                check_essential(headers, InputFile)
+
     #hope python knows this is an class object
     df = InputFile.file_to_df(chsize=1)
     # if df == pd.DataFrame:
     #     print("true")
     # elif df.size
-    headers = df.columns.values
+    headers = df.columns.values.tolist()
     global header_num
     header_num = len(headers)
     dispose = list()
@@ -58,25 +70,16 @@ def header_IDer(InputFile):
     for i, header in enumerate(headers):
         print(i)
         df = InputFile.file_to_df(cols=[i], chsize=25)
-        header = df.columns.values.tolist()[0]
         while True:
             for c, col in enumerate(col_types):
                 if col_check(df, header, col[1], col[2]):
-                    #if header is already in the headers list (for header in headers list except current header)
-                    if col[0] in [x for i, x in enumerate(headers) if i != c]:
-                        #if that duplicate header is "allele"
-                        if col[0] == 'allele' and 'A2' not in headers:
-                            allele_check()
-                        # if duplicate header is not allele, let user check the columns
-                        else:
-                            headers = App.usr_check.init_usr_check(InputFile)
-                            headers = check_essential(headers, InputFile)
-                            return headers
+                    # call duplicate check for duplicate headers
+                    duplicate_check(headers)
                     headers[i] = col[0]
                 else:
                     dispose.append(i)
             break
-
+    print(headers)
     return headers, dispose
 
 
@@ -93,7 +96,7 @@ def identical_increment():
         MutableFile.names = [0 for i in range(header_num)]
 
 
-def col_check(df, header, rehead, recol, head= False, col= False):
+def col_check(df, header, rehead, recol, head=False, col=False):
 
     hdPattern = re.compile(r'{}'.format(rehead), re.I)
     colPattern = re.compile(r'(\s)*{}(\s)*'.format(recol), re.I)
