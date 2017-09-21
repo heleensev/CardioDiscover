@@ -4,6 +4,7 @@ from App import glob
 
 logger = logging.getLogger(__name__)
 
+
 def init_check_correct(InputFile):
     type_checker(InputFile)
 
@@ -18,7 +19,7 @@ def type_checker(InputFile):
 
     disposed = InputFile.disposed
     # for header in headers of InputFile except for the disposed columns
-    for head in [x for i,x in enumerate(headers) if i not in disposed]:
+    for head in [x for i, x in enumerate(headers) if i not in disposed]:
         df = InputFile.file_to_df(cols=head)
         df = check_vals(df, head)
         CheckedFile.writedf_to_file(df, header=head)

@@ -1,6 +1,7 @@
 #global objects and classes use throughout the program
 import logging
 import pandas as pd
+from App import usr_check
 
 #Global classes available throughout the program
 class UncheckedFile:
@@ -34,7 +35,14 @@ class CheckedFile:
 
         self.file = col[header].to_csv(filename, index=False, mode='a')
 
-        pass
+class InvalidHeaderError(Exception):
+    def __init__(self, message, errors):
+        # Call the base class constructor with the parameters it needs
+        super(InvalidHeaderError, self).__init__(message)
+
+        # Now for your custom code...
+        self.errors = errors
+    #def call_usr_check(self, file, ):
 
 
 logging_config = dict(

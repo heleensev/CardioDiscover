@@ -1,7 +1,7 @@
 #Module for automatic check on datatypes in the individual columns
 import re, logging
 import pandas as pd
-import App
+from App import config
 logger = logging.getLogger(__name__)
 MutableFile = object()
 header_num = int()
@@ -9,7 +9,7 @@ identical = 0
 
 col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
-             ['BP', '(((pos)|(loc)|(bp))($)|([ _-]))?(hg(\d){2})?(grch(\d){2})*', '\d+'],
+             ['BP', '((pos)|(loc)|(bp)($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
              ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ACTGDI]{1}($|(\s))'],
              ['major_allele', 'major', '[ATCGDI]{1}'],
@@ -41,25 +41,33 @@ def header_IDer(InputFile):
     def allele_check():
         # check if allele is already added to the headers list
         #not being assigned for some reason
-        if 'A1' in headers:
-            headers[i] = 'A2'
-        else:
-            headers[i] = 'A1'
-        return headers
+        if col[0] == 'allele':
+            if 'A1' and 'A2' not in headers:
+                if 'A1' in headers:
+                    allele = 'A2'
+                else:
+                    allele = 'A1'
+                return allele
+        return False
 
     def duplicate_check(headers):
-
-        # if header is already in the headers list (for header in headers list except current header)
-        if col[0] in [x for n, x in enumerate(headers) if n != i]:
-            print(header)
-            # if that duplicate header is "allele"
-            if col[0] == 'allele' and 'A2' not in headers:
-                allele_check()
+        try:
+            # if header is already in the headers list (for header in headers list except current header)
+            if col[0] in [x for n, x in enumerate(headers) if n != i]:
+                print(header)
+                # if that duplicate header is "allele"
+                allele = allele_check()
+                if not allele:
+                    raise config.InvalidHeaderError
+                else:
+                    return allele
+        except config.InvalidHeaderError("Duplicate header found, initiating user check", "DuplicationError"):
             # if duplicate header is not allele, let user check the columns
-            else:
-                headers = App.usr_check.init_usr_check(InputFile)
-                check_essential(headers, InputFile)
-        return headers
+            # usr_headers = usr_check.init_usr_check(InputFile)
+            # check_essential(usr_headers, InputFile)
+            pass
+
+
 
     #hope python knows this is an class object
     df = InputFile.file_to_df(chsize=1)
@@ -79,11 +87,13 @@ def header_IDer(InputFile):
             for c, col in enumerate(col_types):
                 if col_check(df, header, col[1], col[2]):
                     # call duplicate check for duplicate headers
-                    headers = duplicate_check(headers)
-                    headers[i] = col[0]
+                    new_header = duplicate_check(headers)
+                    if new_header:
+                        headers[i] = new_header
+                    else:
+                        headers[i] = col[0]
                     break
-                else:
-                    dispose.append(i)
+            dispose.append(i)
             break
     print(headers)
     return headers, dispose
@@ -124,7 +134,6 @@ def col_check(df, header, rehead, recol, head=False, col=False):
         identical_increment()
     # if header or column matches with the pattern, header is confirmed
     if head and col:
-        #checker(df, head)
         return True
     else:
         return False
@@ -133,18 +142,20 @@ def check_essential(headers, file):
     #required headers for the input GWAS file
     required = ['marker_original', 'CHR', 'BP', '(effect)|(major)|(A1)',
                 '(non_effect)|(minor)|(A2)', 'freq', 'Beta', 'P']
-
-    for req in required:
-        match = False
-        for head in headers:
-            hdPattern = re.compile(r'{}'.format(req))
-            if hdPattern.match(head):
-                match = True
-        if not match:
-            #if essential header is not identified, user input is required
-            headers = App.usr_check.init_usr_check(file)
-            check_essential(headers, file)
-            break
+    try:
+        for req in required:
+            match = False
+            for head in headers:
+                hdPattern = re.compile(r'{}'.format(req))
+                if hdPattern.match(head):
+                    match = True
+            if not match:
+                #if essential header is not identified, user input is required
+                raise config.InvalidHeaderError
+    except config.InvalidHeaderError("Required headers not found, initiating usr check", "NoRequiredHeaders"):
+        # usr_headers = usr_check.init_usr_check(file)
+        # check_essential(usr_headers, file)
+        pass
 
     return headers
 
