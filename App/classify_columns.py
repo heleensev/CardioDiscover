@@ -2,6 +2,8 @@
 import re, logging
 import pandas as pd
 from App import config
+import App.usr_classify_columns as usr_check
+
 logger = logging.getLogger(__name__)
 MutableFile = object()
 header_num = int()
@@ -9,19 +11,19 @@ identical = 0
 
 col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
-             ['BP', '((pos)|(loc)|(bp)($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
+             ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
              ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ACTGDI]{1}($|(\s))'],
              ['major_allele', 'major', '[ATCGDI]{1}'],
              ['minor_allele', 'minor', '[ATCGDI]{1}'],
              ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
              ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'],
-             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)?(EAF)?', '(0)*\.\d*'],
-             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)?(MAF)?', '(0)*\.\d*'],
+             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)|(EAF)', '(0)*\.\d*'],
+             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)|(MAF)', '(0)*\.\d*'],
              ['Beta', '(beta)|(effect)|(OR)', '\d*\.\d\?*(E)?-?\d*'],
              ['SE', '(se)|(std)', '\d*\.\d\?*(E)?-?\d*'],
-             ['sample', '((n[ _-]?)$)|(studies)|(case)', '[0-10000]'],
-             ['P', 'p([ _-])?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
+             ['sample', '((n[ _-]?))?(studies)|(case)|$', '[0-10000]'],
+             ['P', 'p([ _-])?\.?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
              ['control', 'control', '[0-10000]']]
              #['info', '(info)|(annot)', '\w']]
 
@@ -39,35 +41,41 @@ def init_classifier(InputFile):
 def header_IDer(InputFile):
 
     def allele_check():
-        # check if allele is already added to the headers list
-        #not being assigned for some reason
-        if col[0] == 'allele':
-            if 'A1' and 'A2' not in headers:
-                if 'A1' in headers:
-                    allele = 'A2'
-                else:
-                    allele = 'A1'
-                return allele
-        return False
+        new_header = dup_vals_check('allele', ['A1', 'A2'])
+        if new_header:
+            return new_header
 
-    def duplicate_check(headers):
+    def freq_check():
+        new_header = dup_vals_check('freq', ['freq1', 'freq2'])
+        if new_header:
+            return new_header
+
+    def dup_vals_check(val, dup_vals):
+        # check and correction for values that are allowed to be duplicate in the headers (i.e: allele and freq)
+        if col[0] == val:
+            if header in dup_vals:
+                return header
+            if dup_vals[0] in headers:
+                new_header = dup_vals[1]
+            else:
+                new_header = dup_vals[0]
+            return new_header
+
+    def duplicate_check():
         try:
             # if header is already in the headers list (for header in headers list except current header)
-            if col[0] in [x for n, x in enumerate(headers) if n != i]:
+            # headers minus current evaluated value
+            headers_min_cur = [x for n, x in enumerate(headers) if n != i]
+            if col[0] in headers_min_cur:
                 print(header)
-                # if that duplicate header is "allele"
-                allele = allele_check()
-                if not allele:
-                    raise config.InvalidHeaderError
-                else:
-                    return allele
-        except config.InvalidHeaderError("Duplicate header found, initiating user check", "DuplicationError"):
+                raise ValueError
+            else:
+                return True
+        except ValueError:
             # if duplicate header is not allele, let user check the columns
-            # usr_headers = usr_check.init_usr_check(InputFile)
-            # check_essential(usr_headers, InputFile)
-            pass
-
-
+            usr_headers = usr_check.init_usr_check(InputFile)
+            check_essential(usr_headers, InputFile)
+            print("blabla")
 
     #hope python knows this is an class object
     df = InputFile.file_to_df(chsize=1)
@@ -83,18 +91,19 @@ def header_IDer(InputFile):
     for i, header in enumerate(headers):
         print(i)
         df = InputFile.file_to_df(cols=[i], chsize=25)
-        while True:
-            for c, col in enumerate(col_types):
-                if col_check(df, header, col[1], col[2]):
-                    # call duplicate check for duplicate headers
-                    new_header = duplicate_check(headers)
-                    if new_header:
-                        headers[i] = new_header
-                    else:
-                        headers[i] = col[0]
+        for c, col in enumerate(col_types):
+            if col_check(df, header, col[1], col[2]):
+                new_header = col[0]
+                # call duplicate check for duplicate headers
+                if duplicate_check():
+                    if allele_check():
+                        new_header = allele_check()
+                    elif freq_check():
+                        new_header = freq_check()
+                    headers[i] = new_header
                     break
+        else:
             dispose.append(i)
-            break
     print(headers)
     return headers, dispose
 
@@ -141,7 +150,7 @@ def col_check(df, header, rehead, recol, head=False, col=False):
 def check_essential(headers, file):
     #required headers for the input GWAS file
     required = ['marker_original', 'CHR', 'BP', '(effect)|(major)|(A1)',
-                '(non_effect)|(minor)|(A2)', 'freq', 'Beta', 'P']
+                '(non_effect)|(minor)|(A2)', 'freq1', 'Beta', 'P']
     try:
         for req in required:
             match = False
@@ -151,11 +160,15 @@ def check_essential(headers, file):
                     match = True
             if not match:
                 #if essential header is not identified, user input is required
-                raise config.InvalidHeaderError
-    except config.InvalidHeaderError("Required headers not found, initiating usr check", "NoRequiredHeaders"):
-        # usr_headers = usr_check.init_usr_check(file)
-        # check_essential(usr_headers, file)
-        pass
+                raise ValueError
+    except ValueError:
+        usr_headers = usr_check.init_usr_check(file)
+        check_essential(usr_headers, file)
+        print("blabla")
 
     return headers
+
+"""notes to self: 3 GWAS parsed without duplicate errors, but not through check_essential
+    HTN headers: ['Trait', 'Ethnic', 'marker_original', 'CHR', 'BP', 'A1', 'A2', 'Freq1', 'Effect', 'SE', 'P', 'Direction', 'HetISq', 'HetDf', 'HetPVal']
+    (Freq1 and Effect not recognized) peace out"""
 

@@ -25,6 +25,7 @@ def init_usr_check(file):
 def column_unifier(file):
     logger.info("entering column_unifier\n")
 
+    print("Automatic column parsing not succesful. Help me, human?")
     skip = input("Skip column check? Y/N\n")
     while True:
         if skip.upper() == "N":
