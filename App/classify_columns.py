@@ -9,7 +9,7 @@ MutableFile = object()
 header_num = int()
 identical = 0
 
-col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
+col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '(^((rs)[ _-]?)|^)\d+'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
@@ -146,6 +146,7 @@ def col_check(df, header, rehead, recol, head=False, col=False):
         return True
     else:
         return False
+
 
 def check_essential(headers, file):
     #required headers for the input GWAS file
