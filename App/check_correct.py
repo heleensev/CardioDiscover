@@ -86,3 +86,5 @@ def check_vals(df, head):
 # def check P_value():
 
 #def check
+
+"""note to self: fixed regex bugs with - values, work with dispose and headers from InputFile in this script"""

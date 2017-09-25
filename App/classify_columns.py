@@ -9,7 +9,7 @@ MutableFile = object()
 header_num = int()
 identical = 0
 
-col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
+col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs)[ _-]?)?\d+'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
@@ -17,10 +17,10 @@ col_types = [['marker_original', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '
              ['major_allele', 'major', '[ATCGDI]{1}'],
              ['minor_allele', 'minor', '[ATCGDI]{1}'],
              ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
-             ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '(0)*\.\d*'],
-             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)|(EAF)', '(0)*\.\d*'],
-             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)|(MAF)', '(0)*\.\d*'],
-             ['Beta', '(beta)|(effect)|(OR)', '\d*\.\d\?*(E)?-?\d*'],
+             ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '\d*\.\d\?*(E)?-?\d*'],
+             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)|(EAF)', '\d*\.\d\?*(E)?-?\d*'],
+             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)|(MAF)', '\d*\.\d\?*(E)?-?\d*'],
+             ['Beta', '(beta)|(effect)|(OR)', '(-)?\d*\.\d\?*(E)?-?\d*'],
              ['SE', '(se)|(std)', '\d*\.\d\?*(E)?-?\d*'],
              ['sample', '((n[ _-]?))?(studies)|(case)|$', '[0-10000]'],
              ['P', 'p([ _-])?\.?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
@@ -54,7 +54,7 @@ def header_IDer(InputFile):
         # check and correction for values that are allowed to be duplicate in the headers (i.e: allele and freq)
         if col[0] == val:
             if header in dup_vals:
-                return header
+                return header.lower()
             if dup_vals[0] in headers:
                 new_header = dup_vals[1]
             else:
@@ -149,7 +149,7 @@ def col_check(df, header, rehead, recol, head=False, col=False):
 
 def check_essential(headers, file):
     #required headers for the input GWAS file
-    required = ['marker_original', 'CHR', 'BP', '(effect)|(major)|(A1)',
+    required = ['SNP', 'CHR', 'BP', '(effect)|(major)|(A1)',
                 '(non_effect)|(minor)|(A2)', 'freq1', 'Beta', 'P']
     try:
         for req in required:
@@ -170,5 +170,7 @@ def check_essential(headers, file):
 
 """notes to self: 3 GWAS parsed without duplicate errors, but not through check_essential
     HTN headers: ['Trait', 'Ethnic', 'marker_original', 'CHR', 'BP', 'A1', 'A2', 'Freq1', 'Effect', 'SE', 'P', 'Direction', 'HetISq', 'HetDf', 'HetPVal']
-    (Freq1 and Effect not recognized) peace out"""
+    (Freq1 and Effect not recognized) peace out
+
+    Todo: make a todolist, think of something for sliding columns, and other thing"""
 
