@@ -9,15 +9,16 @@ MutableFile = object()
 header_num = int()
 identical = 0
 
-col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '(^((rs)[ _-]?)|^)\d+'],
+col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?\d+)|'
+              '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
              ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ACTGDI]{1}($|(\s))'],
              ['major_allele', 'major', '[ATCGDI]{1}'],
              ['minor_allele', 'minor', '[ATCGDI]{1}'],
-             ['allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
-             ['freq', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[12])?)', '\d*\.\d\?*(E)?-?\d*'],
+             ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
+             ['FRQ', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?)', '\d*\.\d\?*(E)?-?\d*'],
              ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)|(EAF)', '\d*\.\d\?*(E)?-?\d*'],
              ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)|(MAF)', '\d*\.\d\?*(E)?-?\d*'],
              ['Beta', '(beta)|(effect)|(OR)', '(-)?\d*\.\d\?*(E)?-?\d*'],
@@ -41,12 +42,12 @@ def init_classifier(InputFile):
 def header_IDer(InputFile):
 
     def allele_check():
-        new_header = dup_vals_check('allele', ['A1', 'A2'])
+        new_header = dup_vals_check('Allele', ['A1', 'A2'])
         if new_header:
             return new_header
 
     def freq_check():
-        new_header = dup_vals_check('freq', ['freq1', 'freq2'])
+        new_header = dup_vals_check('FRQ', ['FRQ1', 'FRQ2'])
         if new_header:
             return new_header
 
@@ -54,7 +55,7 @@ def header_IDer(InputFile):
         # check and correction for values that are allowed to be duplicate in the headers (i.e: allele and freq)
         if col[0] == val:
             if header in dup_vals:
-                return header.lower()
+                return header
             if dup_vals[0] in headers:
                 new_header = dup_vals[1]
             else:
@@ -123,8 +124,8 @@ def identical_increment():
 
 def col_check(df, header, rehead, recol, head=False, col=False):
 
-    hdPattern = re.compile(r'{}'.format(rehead), re.I)
-    colPattern = re.compile(r'(\s)*{}(\s)*'.format(recol), re.I)
+    hdPattern = re.compile(r'(\s|^){}(\s|$)'.format(rehead), re.I)
+    colPattern = re.compile(r'(\s|^){}(\s|$)'.format(recol), re.I)
 
     # if 20 of 25 values match the column pattern, the type is confirmed
     cnt = 0
@@ -151,7 +152,7 @@ def col_check(df, header, rehead, recol, head=False, col=False):
 def check_essential(headers, file):
     #required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', '(effect)|(major)|(A1)',
-                '(non_effect)|(minor)|(A2)', 'freq1', 'Beta', 'P']
+                '(non_effect)|(minor)|(A2)', 'FRQ[12]?', 'Beta', 'P', 'SE']
     try:
         for req in required:
             match = False

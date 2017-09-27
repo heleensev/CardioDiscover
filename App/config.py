@@ -16,23 +16,28 @@ class UncheckedFile:
         # sep = df_buffer.get('separator')
         filename = self.filename
         sep = self.sep
-        headers = self.headers
         names = self.names
         print("sep: {}".format(sep))
-        for df in pd.read_csv(filename, header=headers, names=names, sep=sep, chunksize=chsize, usecols=cols):
+        for df in pd.read_csv(filename, header=0, names=names, sep=sep, chunksize=chsize, usecols=cols):
             return df
+
+    def file_to_dfcol(self, cols=None):
+        filename = self.filename
+        sep = self.sep
+        names = self.names
+        df = pd.read_csv(filename, header=0, names=names, sep=sep, usecols=cols)
+        return df
+
 
 class CheckedFile:
     def __init__(self, filename, dispose):
         self.dispose = dispose
         self.file = '{}.csv'.format(filename)
 
-    def writedf_to_file(self, col, header):
+    def writedf_to_file(self, df, header):
         filename = self.file
-        header = header
-        col = pd.DataFrame(col)
 
-        self.file = col[header].to_csv(filename, index=False, mode='a')
+        self.file = df.to_csv(filename, index=False, mode='a', header= header)
 
 
 
