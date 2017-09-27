@@ -1,5 +1,5 @@
 #global objects and classes use throughout the program
-import logging
+import logging, os
 import pandas as pd
 
 #Global classes available throughout the program
@@ -32,12 +32,19 @@ class UncheckedFile:
 class CheckedFile:
     def __init__(self, filename, dispose):
         self.dispose = dispose
-        self.file = '{}.csv'.format(filename)
+        self.filename = '{}.csv'.format(filename)
+        self.file = open('{}'.format(filename))
+
 
     def writedf_to_file(self, df, header):
-        filename = self.file
+        filename = self.filename
 
-        self.file = df.to_csv(filename, index=False, mode='a', header= header)
+        if os.path.isfile(filename):
+            csv_input = pd.read_csv(filename, chunksize=2)
+            csv_input[header] = csv_input['Name']
+        csv_input.to_csv('output.csv', index=False)
+
+        file = df.to_csv(filename, index=False, header=header)
 
 
 
@@ -70,3 +77,5 @@ logging_config = dict(
         'level': logging.DEBUG,
     },
 )
+
+"""fix writing to csv in chunks in CheckedFile"""

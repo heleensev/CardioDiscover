@@ -1,5 +1,7 @@
 #check datatypes in all columns
-import re, logging, numpy
+import re, logging
+import numpy as np
+import pandas as pd
 from App import glob
 
 logger = logging.getLogger(__name__)
@@ -10,19 +12,17 @@ col_types = {'SNP': ['((rs[ _-]?)?\d+)|'
                      '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)', 'rs_check'],
              'CHR': ['(\d){1,2}|[XY]', 'chr_check'],
              'BP': ['\d{10}', 'bp_check'],
-             'effect_allele': ['[ATCGDI]{1}', 'allele_check'],
-             'non_effect_allele': ['[ATCGDI]{1}', 'allele_check'],
-             'major_allele': ['allele', '[ATCGDI]{1}'],
-             'minor_allele': ['allele', '[ATCGDI]{1}'],
-             'Allele': ['allele', '[ATCGDI]{1}'],
-             'FRQ': ['freq_check', '(0)*\.\d*'],
-             'A1_freq': ['freq_check', '(0)*\.\d*'],
-             'A2_freq': ['freq_check', '(0)*\.\d*'],
-             'Beta': ['beta_check', '\d*\.\d\?*(E)?-?\d*'],
-             'SE': ['se_check', '\d*\.\d\?*(E)?-?\d*'],
-             'sample': ['sample_check', '[0-10000]'],
-             'P': ['pval_check', '\d*\.\d\?*(E)?-?\d*'],
-             'control': ['control_check', '[0-10000]']}
+             'A1': ['[ATCGDI]{1}', 'allele_check'],
+             'A2': ['[ATCGDI]{1}', 'allele_check'],
+             'Allele': ['[ATCGDI]{1}', 'allele_check'],
+             'FRQ': ['(0)*\.\d*', 'freq_check'],
+             'FRQ1': ['(0)*\.\d*', 'freq_check'],
+             'FRQ2': ['(0)*\.\d*', 'freq_check'],
+             'Beta': ['\d*\.\d\?*(E)?-?\d*', 'beta_check'],
+             'SE': ['\d*\.\d\?*(E)?-?\d*', 'se_check'],
+             'P': ['\d*\.\d\?*(E)?-?\d*', 'pval_check'],
+             'sample': ['[0-10000]', 'sample_control_check'],
+             'control': ['[0-10000]', 'sample_control_check']}
 
 def init_check_correct(InputFile):
     type_checker(InputFile)
@@ -41,20 +41,16 @@ def type_checker(InputFile):
     disposed = CheckedFile.dispose
     # for header in headers of InputFile except for the disposed columns
     for n, head in enumerate([x for i, x in enumerate(headers) if i not in disposed]):
+        print(n)
         df = InputFile.file_to_dfcol(cols=[n])
-        df = check_vals(df, n, head)
+        df, head = check_vals(df, n, head)
         CheckedFile.writedf_to_file(df, header=head)
-
-def slide_check():
-
-    for row_index in row_errors:
-        if row_errors.get(row_index) > 1:
-            pass
 
 
 def check_vals(df, n, head):
 
     global row_errors
+    df_BED = None
 
     def rs_check():
         # check if rs prefix is present, if not, return concatenated value
@@ -64,7 +60,7 @@ def check_vals(df, n, head):
             return new_val
         # if SNP pattern matches with BED format, insert into BED column
         elif match.group(4):
-            df.iloc[i, n+1] = match.group(4)
+            df_BED.iloc[i] = match.group(4)
             return False
 
     def chr_check():
@@ -72,6 +68,8 @@ def check_vals(df, n, head):
         cur_val = val
         if isinstance(cur_val, int) and cur_val > 22:
             return False
+        else:
+            return True
 
     # check if human base pair number is no higher than 3,3 billion
     def bp_check():
@@ -79,18 +77,26 @@ def check_vals(df, n, head):
         bp_human_genome = 3300000000
         if cur_val > bp_human_genome:
             return False
-    #
+        else:
+            return True
+
     def allele_check():
-        pass
+        return True
 
     def freq_check():
-        pass
+        return True
 
     def beta_check():
-        pass
+        return True
+
+    def pval_check():
+        return True
 
     def se_check():
-        pass
+        return True
+
+    def sample_control_check():
+        return True
 
     disposed_vals = {"marker_original": [],
                      "CHR": [],
@@ -99,13 +105,15 @@ def check_vals(df, n, head):
     check_funcs = {'rs_check': rs_check, 'chr_check': chr_check,
                    'bp_check': bp_check, 'allele_check': allele_check,
                    'freq_check': freq_check, 'beta_check': beta_check,
-                   'se_check': se_check}
+                   'pval_check': pval_check, 'se_check': se_check,
+                   'control_check': sample_control_check()}
 
     column = head
     if column == 'SNP':
         # create extra column for values in BED format in SNP column
         #df.insert(n, 'BED', None)
-        df['BED'] = None
+        nan_values = [np.NaN for i in df.itertuples()]
+        df_BED = pd.DataFrame({'BED': nan_values})
 
     pattern = col_types.get(head)[0]
 
@@ -121,16 +129,20 @@ def check_vals(df, n, head):
             if col_types.get(head)[1]:
                 passed = check_funcs.get((col_types.get(head)[1]))()
                 if not passed:
-                    passed = str(numpy.NaN)
+                    passed = str(np.NaN)
             else:
                 continue
             df.replace(str(val), passed)
         else:
-            df.replace(str(val), str(numpy.NaN))
+            df.replace(str(val), str(np.NaN))
             # count number of errors for one row in a dictionary
             row_errors[str(i)] = row_errors.get(str(i), 0) + 1
 
-    return df
+    if column == 'SNP':
+        df = df.append(df_BED)
+        head = [head, 'BED']
+
+    return df, head
 
 
 
