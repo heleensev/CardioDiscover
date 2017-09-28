@@ -8,21 +8,20 @@ logger = logging.getLogger(__name__)
 
 row_errors = dict()
 
-col_types = {'SNP': ['((rs[ _-]?)?\d+)|'
-                     '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)', 'rs_check'],
-             'CHR': ['(\d){1,2}|[XY]', 'chr_check'],
-             'BP': ['\d{10}', 'bp_check'],
-             'A1': ['[ATCGDI]{1}', 'allele_check'],
-             'A2': ['[ATCGDI]{1}', 'allele_check'],
-             'Allele': ['[ATCGDI]{1}', 'allele_check'],
-             'FRQ': ['(0)*\.\d*', 'freq_check'],
-             'FRQ1': ['(0)*\.\d*', 'freq_check'],
-             'FRQ2': ['(0)*\.\d*', 'freq_check'],
-             'Beta': ['\d*\.\d\?*(E)?-?\d*', 'beta_check'],
-             'SE': ['\d*\.\d\?*(E)?-?\d*', 'se_check'],
-             'P': ['\d*\.\d\?*(E)?-?\d*', 'pval_check'],
-             'sample': ['[0-10000]', 'sample_control_check'],
-             'control': ['[0-10000]', 'sample_control_check']}
+col_types = {'SNP': '((rs[ _-]?)?\d+)|'
+             '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
+             'CHR': '(\d){1,2}|[XY]',
+             'BP': '\d{10}',
+             'A1': '[ATCGDI]{1}',
+             'A2': '[ATCGDI]{1}',
+             'FRQ': '(0)*\.\d*',
+             'FRQ1': '(0)*\.\d*',
+             'FRQ2': '(0)*\.\d*',
+             'Effect': '\d*\.\d\?*(E)?-?\d*',
+             'SE': '\d*\.\d\?*(E)?-?\d*',
+             'P': '\d*\.\d\?*(E)?-?\d*',
+             'case': '[0-10000]',
+             'control': '[0-10000]'}
 
 def init_check_correct(InputFile):
     type_checker(InputFile)
@@ -37,15 +36,19 @@ def type_checker(InputFile):
     disposed = InputFile.skip
     # create new file object, contains attributes for the processed output file
     CheckedFile = glob.CheckedFile(filename, disposed)
-
+    # disposed columns
     disposed = CheckedFile.dispose
+    # csv_names
+    csv_names = list()
+    # all columns without disposed columns
+    headers = [x for i, x in enumerate(headers) if i not in disposed]
     # for header in headers of InputFile except for the disposed columns
-    for n, head in enumerate([x for i, x in enumerate(headers) if i not in disposed]):
+    for n, head in enumerate(headers):
         print(n)
         df = InputFile.file_to_dfcol(cols=[n])
         df, head = check_vals(df, n, head)
-        CheckedFile.writedf_to_file(df, header=head)
-
+        CheckedFile.writedf_to_file(df=df, header=head)
+        csv_names.append('{}.csv'.format(head))
 
 def check_vals(df, n, head):
 
@@ -86,7 +89,8 @@ def check_vals(df, n, head):
     def freq_check():
         return True
 
-    def beta_check():
+    def effect_check():
+        #check for beta val or odds ratio, minus
         return True
 
     def pval_check():
@@ -102,11 +106,11 @@ def check_vals(df, n, head):
                      "CHR": [],
                      "BP": [],
                      "effect_allele": []}
-    check_funcs = {'rs_check': rs_check, 'chr_check': chr_check,
-                   'bp_check': bp_check, 'allele_check': allele_check,
-                   'freq_check': freq_check, 'beta_check': beta_check,
-                   'pval_check': pval_check, 'se_check': se_check,
-                   'control_check': sample_control_check()}
+
+    check_funcs = {'SNP': rs_check, 'CHR': chr_check, 'BP': bp_check, 'A1': allele_check,
+                   'A2': allele_check(), 'FRQ1': freq_check, 'FRQ2': freq_check,
+                   'Effect': effect_check, 'P': pval_check, 'SE': se_check,
+                   'control': sample_control_check(), 'case': sample_control_check}
 
     column = head
     if column == 'SNP':

@@ -36,16 +36,19 @@ class CheckedFile:
         self.file = open('{}'.format(filename))
 
 
-    def writedf_to_file(self, df, header):
-        filename = self.filename
+    def writedf_to_file(self, df=None, header=None):
+        filename = '{}.csv'.format(header)
 
-        if os.path.isfile(filename):
-            csv_input = pd.read_csv(filename, chunksize=2)
-            csv_input[header] = csv_input['Name']
-        csv_input.to_csv('output.csv', index=False)
+        # if os.path.isfile(filename):
+        #     csv_input = pd.read_csv(filename, chunksize=2)
+        #     csv_input[header] = df[header]
+        # csv_input.to_csv('output.csv', index=False)
 
-        file = df.to_csv(filename, index=False, header=header)
+        df.to_csv(filename, index=False, header=header)
 
+    def concat_dfs(self, csv_names):
+
+        pass
 
 
 # class ExceptionTemplate(Exception):
@@ -78,4 +81,4 @@ logging_config = dict(
     },
 )
 
-"""fix writing to csv in chunks in CheckedFile"""
+"""fix writing to csv in chunks in CheckedFile, use csv reader"""

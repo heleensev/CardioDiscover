@@ -13,20 +13,13 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
               '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
-             ['effect_allele', '(effect)|(ef)|(risk)|(aff)', '[ACTGDI]{1}($|(\s))'],
-             ['non_effect_allele', 'non[-_ ]effect|(un[ _-]?aff)', '[ACTGDI]{1}($|(\s))'],
-             ['major_allele', 'major', '[ATCGDI]{1}'],
-             ['minor_allele', 'minor', '[ATCGDI]{1}'],
              ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
              ['FRQ', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?)', '\d*\.\d\?*(E)?-?\d*'],
-             ['A1_freq', '((((effect)|(major))[ _-]?)fr(e)?q)|(EAF)', '\d*\.\d\?*(E)?-?\d*'],
-             ['A2_freq', '((((non[ -_]?effect)|(minor))[ _-]?)fr(e)?q)|(MAF)', '\d*\.\d\?*(E)?-?\d*'],
-             ['Beta', '(beta)|(effect)|(OR)', '(-)?\d*\.\d\?*(E)?-?\d*'],
+             ['Effect', '(beta)|(effect)|(OR)|odds[ _-]?ratio', '(-)?\d*\.\d\?*(E)?-?\d*'],
              ['SE', '(se)|(std)', '\d*\.\d\?*(E)?-?\d*'],
-             ['sample', '((n[ _-]?))?(studies)|(case)|$', '[0-10000]'],
-             ['P', 'p([ _-])?\.?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*'],
-             ['control', 'control', '[0-10000]']]
-             #['info', '(info)|(annot)', '\w']]
+             ['control', 'control', '[0-10000]'],
+             ['case', '((n[ _-]?))?(studies)|(case)|$', '[0-10000]'],
+             ['P', 'p([ _-])?\.?(val)?(ue)?', '\d*\.\d\?*(E)?-?\d*']]
 
 
 def init_classifier(InputFile):
@@ -122,7 +115,7 @@ def identical_increment():
         MutableFile.names = [0 for i in range(header_num)]
 
 
-def col_check(df, header, rehead, recol, head=False, col=False):
+def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
     hdPattern = re.compile(r'(\s|^){}(\s|$)'.format(rehead), re.I)
     colPattern = re.compile(r'(\s|^){}(\s|$)'.format(recol), re.I)
@@ -144,15 +137,15 @@ def col_check(df, header, rehead, recol, head=False, col=False):
         identical_increment()
     # if header or column matches with the pattern, header is confirmed
     if head and col:
-        return True
-    else:
-        return False
+        result = True
+
+    return result
 
 
 def check_essential(headers, file):
     #required headers for the input GWAS file
-    required = ['SNP', 'CHR', 'BP', '(effect)|(major)|(A1)',
-                '(non_effect)|(minor)|(A2)', 'FRQ[12]?', 'Beta', 'P', 'SE']
+    required = ['SNP', 'CHR', 'BP', 'A1',
+                'A2', 'FRQ[12]?', 'Effect', 'P', 'SE']
     try:
         for req in required:
             match = False
