@@ -30,8 +30,9 @@ class UncheckedFile:
 
 
 class CheckedFile:
-    def __init__(self, filename):
+    def __init__(self, filename, disposed):
         self.filename = filename
+        self.disposed = disposed
         self.columns = list()
 
     def column_names(self, name):
@@ -40,7 +41,13 @@ class CheckedFile:
 
     def write_to_file(self, df, name):
         name = '{}.csv'.format(name)
-        df.to_csv(name, index=False, header=0)
+        df.to_csv(self.get_path(name), index=False, header=0)
+        self.column_names(name)
+
+    def get_path(self, filename):
+        outputdir = '/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Tempfiles'
+        fpath = outputdir + filename
+        return os.path.join(os.path.dirname(__file__), fpath)
 
     def concat_write(self, head=True):
         filename = self.filename
@@ -48,6 +55,7 @@ class CheckedFile:
 
         # pd.read replace by methods, make it cleaner
         cols = [col for col in columns]
+        concat_chunk = pd.DataFrame
         col = cols[0]
         for chunk in pd.read_csv(col, header=head, chunksize=5000):
             col_prev = chunk

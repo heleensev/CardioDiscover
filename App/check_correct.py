@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 row_errors = dict()
 
 col_types = {'SNP': '((rs[ _-]?)?\d+)|'
-             '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
+                    '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
              'CHR': '(\d){1,2}|[XY]',
              'BP': '\d{10}',
              'A1': '[ATCGDI]{1}',
@@ -37,33 +37,26 @@ def type_checker(InputFile):
     # create new file object, contains attributes for the processed output file
     CheckedFile = glob.CheckedFile(filename, disposed)
     # disposed columns
-    disposed = CheckedFile.dispose
-    # csv_names
-    csv_names = list()
+    disposed = CheckedFile.disposed
     # all columns without disposed columns
     headers = [x for i, x in enumerate(headers) if i not in disposed]
     # for header in headers of InputFile except for the disposed columns
     for n, head in enumerate(headers):
         print(n)
         df = InputFile.file_to_dfcol(cols=[n])
-        df, head = check_vals(df, n, head)
+        df, head = check_vals(df, head)
         CheckedFile.writedf_to_file(df=df, header=head)
-        csv_names.append('{}.csv'.format(head))
-    concat_columns(csv_names)
-
-def concat_columns(df):
-
-    for chunk in df:
+    CheckedFile.concat_write()
 
 
-def check_vals(df, n, head):
+def check_vals(df, head):
 
     global row_errors
-    df_BED = None
 
     def rs_check():
         # check if rs prefix is present, if not, return concatenated value
         cur_val = val
+        df_BED = BED
         if match.group(2) and not match.group(3):
             new_val = 'rs{}'.format(cur_val)
             return new_val
@@ -72,22 +65,20 @@ def check_vals(df, n, head):
             df_BED.iloc[i] = match.group(4)
             return False
 
-    def chr_check():
+    def chr_check(result=True):
         # check if autosomal chromosome number is no higher than 22
         cur_val = val
         if isinstance(cur_val, int) and cur_val > 22:
-            return False
-        else:
-            return True
+            result = False
+        return result
 
     # check if human base pair number is no higher than 3,3 billion
-    def bp_check():
+    def bp_check(result=True):
         cur_val = val
         bp_human_genome = 3300000000
         if cur_val > bp_human_genome:
-            return False
-        else:
-            return True
+            result = False
+        return result
 
     def allele_check():
         return True
@@ -123,9 +114,9 @@ def check_vals(df, n, head):
         # create extra column for values in BED format in SNP column
         #df.insert(n, 'BED', None)
         nan_values = [np.NaN for i in df.itertuples()]
-        df_BED = pd.DataFrame({'BED': nan_values})
+        BED = pd.DataFrame({'BED': nan_values})
 
-    pattern = col_types.get(head)[0]
+    pattern = col_types.get(head)
 
     for i, (row, val) in enumerate(df.itertuples()):
         val = str(val)
@@ -136,8 +127,7 @@ def check_vals(df, n, head):
             if ' ' in val:
                 val = val.strip()
                 #df.replace(val, val.strip)
-            if col_types.get(head)[1]:
-                passed = check_funcs.get((col_types.get(head)[1]))()
+                passed = check_funcs.get(check_funcs.get(head))()
                 if not passed:
                     passed = str(np.NaN)
             else:
@@ -149,7 +139,7 @@ def check_vals(df, n, head):
             row_errors[str(i)] = row_errors.get(str(i), 0) + 1
 
     if column == 'SNP':
-        df = df.append(df_BED)
+        df = df.append(BED)
         head = [head, 'BED']
 
     return df, head
