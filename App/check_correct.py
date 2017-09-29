@@ -49,6 +49,12 @@ def type_checker(InputFile):
         df, head = check_vals(df, n, head)
         CheckedFile.writedf_to_file(df=df, header=head)
         csv_names.append('{}.csv'.format(head))
+    concat_columns(csv_names)
+
+def concat_columns(df):
+
+    for chunk in df:
+
 
 def check_vals(df, n, head):
 

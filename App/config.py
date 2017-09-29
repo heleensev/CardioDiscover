@@ -30,25 +30,54 @@ class UncheckedFile:
 
 
 class CheckedFile:
-    def __init__(self, filename, dispose):
-        self.dispose = dispose
-        self.filename = '{}.csv'.format(filename)
-        self.file = open('{}'.format(filename))
+    def __init__(self, filename):
+        self.filename = filename
+        self.columns = list()
 
+    def column_names(self, name):
+        columns = self.columns
+        self.columns = columns.append(name)
 
-    def writedf_to_file(self, df=None, header=None):
-        filename = '{}.csv'.format(header)
+    def write_to_file(self, df, name):
+        name = '{}.csv'.format(name)
+        df.to_csv(name, index=False, header=0)
 
-        # if os.path.isfile(filename):
-        #     csv_input = pd.read_csv(filename, chunksize=2)
-        #     csv_input[header] = df[header]
-        # csv_input.to_csv('output.csv', index=False)
+    def concat_write(self, head=True):
+        filename = self.filename
+        columns = self.columns
 
-        df.to_csv(filename, index=False, header=header)
+        # pd.read replace by methods, make it cleaner
+        cols = [col for col in columns]
+        col = cols[0]
+        for chunk in pd.read_csv(col, header=head, chunksize=5000):
+            col_prev = chunk
+            for col in cols[1:]:
+                col_cur = pd.read_csv(col, header=head, chunksize=5000).get_chunk()
+                concat_chunk = pd.concat([col_prev, col_cur])
+                col_prev = col_cur
+            concat_chunk.to_csv(filename, sep='\t', header=head, mode='a', index=False)
+            head = False
 
-    def concat_dfs(self, csv_names):
-
-        pass
+# class CheckedFile:
+#     def __init__(self, filename, dispose):
+#         self.dispose = dispose
+#         self.filename = '{}.csv'.format(filename)
+#         self.file = open('{}'.format(filename))
+#
+#
+#     def writedf_to_file(self, df=None, header=None):
+#         filename = '{}.csv'.format(header)
+#
+#         # if os.path.isfile(filename):
+#         #     csv_input = pd.read_csv(filename, chunksize=2)
+#         #     csv_input[header] = df[header]
+#         # csv_input.to_csv('output.csv', index=False)
+#
+#         df.to_csv(filename, index=False, header=header)
+#
+#     def concat_dfs(self, csv_names):
+#
+#         pass
 
 
 # class ExceptionTemplate(Exception):
