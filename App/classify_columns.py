@@ -69,7 +69,6 @@ def header_IDer(InputFile):
             # if duplicate header is not allele, let user check the columns
             usr_headers = usr_check.init_usr_check(InputFile)
             check_essential(usr_headers, InputFile)
-            print("blabla")
 
     #hope python knows this is an class object
     df = InputFile.file_to_df(chsize=1)
@@ -117,8 +116,8 @@ def identical_increment():
 
 def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
-    hdPattern = re.compile(r'(\s|^){}(\s|$)'.format(rehead), re.I)
-    colPattern = re.compile(r'(\s|^){}(\s|$)'.format(recol), re.I)
+    hdPattern = re.compile(r'(\s|^)({})(\s|$)'.format(rehead), re.I)
+    colPattern = re.compile(r'(\s|^)({})(\s|$)'.format(recol), re.I)
 
     # if 20 of 25 values match the column pattern, the type is confirmed
     cnt = 0
@@ -146,6 +145,8 @@ def check_essential(headers, file):
     #required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', 'A1',
                 'A2', 'FRQ[12]?', 'Effect', 'P', 'SE']
+    for head in headers:
+        print(head)
     try:
         for req in required:
             match = False
@@ -163,9 +164,7 @@ def check_essential(headers, file):
 
     return headers
 
-"""notes to self: 3 GWAS parsed without duplicate errors, but not through check_essential
-    HTN headers: ['Trait', 'Ethnic', 'marker_original', 'CHR', 'BP', 'A1', 'A2', 'Freq1', 'Effect', 'SE', 'P', 'Direction', 'HetISq', 'HetDf', 'HetPVal']
-    (Freq1 and Effect not recognized) peace out
+"""notes to self: headers not being replaced anymore
 
     Todo: make a todolist, think of something for sliding columns, and other thing"""
 

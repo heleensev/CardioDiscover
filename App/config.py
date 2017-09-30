@@ -37,34 +37,47 @@ class CheckedFile:
 
     def column_names(self, name):
         columns = self.columns
-        self.columns = columns.append(name)
+        columns.append(name)
 
     def write_to_file(self, df, name):
         name = '{}.csv'.format(name)
-        df.to_csv(self.get_path(name), index=False, header=0)
+        df.to_csv(self.get_path(name), index=False)
         self.column_names(name)
 
+    def get_filename(self):
+        file_wo_path = self.filename.split('/')[-1]
+        path = '/'.join(self.filename.split('/')[:-1])
+        self.filename = '{}/processed_{}'.format(path, file_wo_path)
+        # if file already exists, empty the contents
+        if os.path.exists(self.filename):
+            open(self.filename, 'w').close()
+
     def get_path(self, filename):
-        outputdir = '/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Tempfiles'
+        outputdir = '/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Tempfiles/'
         fpath = outputdir + filename
         return os.path.join(os.path.dirname(__file__), fpath)
 
+    def message(self):
+        print('Process succesful! find your checked&corrected file here: {}'.format(self.filename))
+
     def concat_write(self, head=True):
+        self.get_filename()
         filename = self.filename
         columns = self.columns
 
         # pd.read replace by methods, make it cleaner
-        cols = [col for col in columns]
         concat_chunk = pd.DataFrame
-        col = cols[0]
-        for chunk in pd.read_csv(col, header=head, chunksize=5000):
+        col = columns[0]
+        for chunk in pd.read_csv(self.get_path(col), header=0, chunksize=5000):
             col_prev = chunk
-            for col in cols[1:]:
-                col_cur = pd.read_csv(col, header=head, chunksize=5000).get_chunk()
-                concat_chunk = pd.concat([col_prev, col_cur])
-                col_prev = col_cur
+            for col in columns[1:]:
+                col_cur = pd.read_csv(self.get_path(col), header=0, chunksize=5000).get_chunk()
+                concat_chunk = pd.concat([col_prev, col_cur], axis=1)
+                col_prev = concat_chunk
             concat_chunk.to_csv(filename, sep='\t', header=head, mode='a', index=False)
-            head = False
+            head = None
+        self.message()
+
 
 # class CheckedFile:
 #     def __init__(self, filename, dispose):

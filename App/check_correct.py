@@ -45,7 +45,7 @@ def type_checker(InputFile):
         print(n)
         df = InputFile.file_to_dfcol(cols=[n])
         df, head = check_vals(df, head)
-        CheckedFile.writedf_to_file(df=df, header=head)
+        CheckedFile.write_to_file(df, head)
     CheckedFile.concat_write()
 
 
@@ -72,7 +72,7 @@ def check_vals(df, head):
             result = False
         return result
 
-    # check if human base pair number is no higher than 3,3 billion
+    # check if human base pair number is no higher than 3,3 billigon
     def bp_check(result=True):
         cur_val = val
         bp_human_genome = 3300000000
@@ -121,7 +121,7 @@ def check_vals(df, head):
     for i, (row, val) in enumerate(df.itertuples()):
         val = str(val)
         # value may start or end with white space, case insensitive
-        valPattern = re.compile(r'(\s|^){}(\s|$)'.format(pattern), re.I)
+        valPattern = re.compile(r'(\s|^)({})(\s|$)'.format(pattern), re.I)
         match = valPattern.match(val)
         if match:
             if ' ' in val:
@@ -143,27 +143,6 @@ def check_vals(df, head):
         head = [head, 'BED']
 
     return df, head
-
-
-
-
-    # if BED_format:
-    #     process_BED()
-
-# def process_BED():
-#
-# def check_rs(val, match):
-#     if match.group(1):
-#         str(val).lstrip('rs')
-#
-#
-# def check_loc():
-#
-# def check_allele():
-#
-# def check P_value():
-
-#def check
 
 """note to self: fixed regex bugs with - values, work with dispose and headers from InputFile in this script
     fix chromosome col regex, [1-22] not correct"""
