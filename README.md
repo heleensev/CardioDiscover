@@ -1,4 +1,4 @@
-![Image of Logo](https://github.com/LucilleWerner/CardioDiscover/Images/Logo.png)
+![Image of Logo](https://github.com/LucilleWerner/CardioDiscover/blob/master/Images/Logo.png)
 #
 #### About
  This application will enable researchers to automatically discover
