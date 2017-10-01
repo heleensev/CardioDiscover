@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be0d5afb-0b73-4057-a059-8156477fde82" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/2df.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/2df2.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/2df3.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/concat.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/concat2.csv" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Datasets/GWAS/identify_columns(1).py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Datasets/GWAS/empty.txt" afterPath="$PROJECT_DIR$/bugs.md" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/Datasets/GWAS/processed_tag.cpd.table.txt" afterPath="$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/App/check_correct.py" afterPath="$PROJECT_DIR$/App/check_correct.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/App/classify_columns.py" afterPath="$PROJECT_DIR$/App/classify_columns.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/App/config.py" afterPath="$PROJECT_DIR$/App/config.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/GWAS/tag.cpd.table.txt" afterPath="$PROJECT_DIR$/Datasets/GWAS/tag.cpd.table.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/Effect.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/Effect.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/FRQ1.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/FRQ1.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/FRQ2.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/FRQ2.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/P.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/P.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/SE.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/SE.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/['SNP', 'BED'].csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/['SNP', 'BED'].csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -97,12 +78,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="414">
-                <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+              <first_editor relative-caret-position="162">
+                <caret line="9" column="44" lean-forward="true" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
                 <folding />
               </first_editor>
               <second_editor>
@@ -112,12 +93,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="bugs.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="bugs.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/bugs.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
               <first_editor relative-caret-position="36">
-                <caret line="2" column="57" lean-forward="true" selection-start-line="2" selection-start-column="57" selection-end-line="2" selection-end-column="57" />
+                <caret line="2" column="57" lean-forward="false" selection-start-line="2" selection-start-column="57" selection-end-line="2" selection-end-column="57" />
                 <folding />
               </first_editor>
               <second_editor>
@@ -235,9 +216,9 @@
         <option value="$PROJECT_DIR$/App/config.py" />
         <option value="$PROJECT_DIR$/App/classify_columns.py" />
         <option value="$PROJECT_DIR$/App/check_correct.py" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/bugs.md" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -1202,16 +1183,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/App/classify_columns.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1782">
-          <caret line="99" column="0" lean-forward="false" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
-          <folding>
-            <element signature="e#67#85#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Datasets/GWAS/identify_columns(1).py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1260,11 +1231,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/bugs.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="414">
-            <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+          <first_editor relative-caret-position="36">
+            <caret line="2" column="57" lean-forward="false" selection-start-line="2" selection-start-column="57" selection-end-line="2" selection-end-column="57" />
             <folding />
           </first_editor>
           <second_editor>
@@ -1273,11 +1244,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/bugs.md">
+    <entry file="file://$PROJECT_DIR$/App/classify_columns.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1782">
+          <caret line="99" column="0" lean-forward="false" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+          <folding>
+            <element signature="e#67#85#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="36">
-            <caret line="2" column="57" lean-forward="true" selection-start-line="2" selection-start-column="57" selection-end-line="2" selection-end-column="57" />
+          <first_editor relative-caret-position="162">
+            <caret line="9" column="44" lean-forward="true" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
             <folding />
           </first_editor>
           <second_editor>
