@@ -34,6 +34,7 @@ def type_checker(InputFile):
     headers = InputFile.headers
     #columns to skip
     disposed = InputFile.skip
+    print('disposed: {}'.format(disposed))
     # create new file object, contains attributes for the processed output file
     CheckedFile = glob.CheckedFile(filename, disposed)
     # disposed columns
@@ -43,7 +44,7 @@ def type_checker(InputFile):
     # for header in headers of InputFile except for the disposed columns
     for n, head in enumerate(headers):
         print(n)
-        df = InputFile.file_to_dfcol(cols=[n])
+        df = InputFile.file_to_dfcol(head=head, cols=[n])
         df, head = check_vals(df, head)
         CheckedFile.write_to_file(df, head)
     CheckedFile.concat_write()
@@ -53,17 +54,19 @@ def check_vals(df, head):
 
     global row_errors
 
-    def rs_check():
+    # specific check functions for column type in GWAS
+    def rs_check(result=True):
         # check if rs prefix is present, if not, return concatenated value
         cur_val = val
         df_BED = BED
-        if match.group(2) and not match.group(3):
+        if not match.group(4):
             new_val = 'rs{}'.format(cur_val)
             return new_val
         # if SNP pattern matches with BED format, insert into BED column
-        elif match.group(4):
-            df_BED.iloc[i] = match.group(4)
-            return False
+        elif match.group(5):
+            df_BED.iloc[i] = match.group(5)
+            result = False
+        return result
 
     def chr_check(result=True):
         # check if autosomal chromosome number is no higher than 22
@@ -99,15 +102,14 @@ def check_vals(df, head):
     def sample_control_check():
         return True
 
-    disposed_vals = {"marker_original": [],
-                     "CHR": [],
-                     "BP": [],
-                     "effect_allele": []}
+    def row_errors_append():
+        # count number of errors for one row in a dictionary
+        row_errors[str(i)] = row_errors.get(str(i), 0) + 1
 
     check_funcs = {'SNP': rs_check, 'CHR': chr_check, 'BP': bp_check, 'A1': allele_check,
-                   'A2': allele_check(), 'FRQ1': freq_check, 'FRQ2': freq_check,
+                   'A2': allele_check, 'FRQ1': freq_check, 'FRQ2': freq_check,
                    'Effect': effect_check, 'P': pval_check, 'SE': se_check,
-                   'control': sample_control_check(), 'case': sample_control_check}
+                   'control': sample_control_check, 'case': sample_control_check}
 
     column = head
     if column == 'SNP':
@@ -117,26 +119,31 @@ def check_vals(df, head):
         BED = pd.DataFrame({'BED': nan_values})
 
     pattern = col_types.get(head)
-
     for i, (row, val) in enumerate(df.itertuples()):
         val = str(val)
         # value may start or end with white space, case insensitive
         valPattern = re.compile(r'(\s|^)({})(\s|$)'.format(pattern), re.I)
         match = valPattern.match(val)
         if match:
+            # get corresponding check for column type from dict 'check_funcs'
+            passed = check_funcs.get(head)()
             if ' ' in val:
-                val = val.strip()
-                #df.replace(val, val.strip)
-                passed = check_funcs.get(check_funcs.get(head))()
-                if not passed:
-                    passed = str(np.NaN)
+                passed = val.strip()
+            # if not passed more stringent check, the value is set to NaN
+            if not passed:
+                passed = str(np.NaN)
+                row_errors_append()
+            elif type(passed) is str:
+                passed = passed.strip()
+            elif ' ' in val:
+                passed = val.strip()
             else:
+                # if matched, passed and not stripped, don't replace value
                 continue
-            df.replace(str(val), passed)
+            df.replace(val, passed)
         else:
-            df.replace(str(val), str(np.NaN))
-            # count number of errors for one row in a dictionary
-            row_errors[str(i)] = row_errors.get(str(i), 0) + 1
+            df.replace(val, str(np.NaN))
+            row_errors_append()
 
     if column == 'SNP':
         df = df.append(BED)

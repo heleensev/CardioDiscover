@@ -21,11 +21,11 @@ class UncheckedFile:
         for df in pd.read_csv(filename, header=0, names=names, sep=sep, chunksize=chsize, usecols=cols):
             return df
 
-    def file_to_dfcol(self, cols=None):
+    def file_to_dfcol(self, head, cols=None):
         filename = self.filename
         sep = self.sep
         names = self.names
-        df = pd.read_csv(filename, header=0, names=names, sep=sep, usecols=cols)
+        df = pd.read_csv(filename, header=0, names=[head], sep=sep, usecols=cols)
         return df
 
 
@@ -41,7 +41,7 @@ class CheckedFile:
 
     def write_to_file(self, df, name):
         name = '{}.csv'.format(name)
-        df.to_csv(self.get_path(name), index=False)
+        df.to_csv(self.get_path(name), index=False, header=name)
         self.column_names(name)
 
     def get_filename(self):

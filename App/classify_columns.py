@@ -44,8 +44,9 @@ def header_IDer(InputFile):
         if new_header:
             return new_header
 
+    # check and correction for values that are allowed to be duplicate in the headers (i.e: allele and freq)
     def dup_vals_check(val, dup_vals):
-        # check and correction for values that are allowed to be duplicate in the headers (i.e: allele and freq)
+        # if the current column name from col_types in the loop matches FRQ or Allele
         if col[0] == val:
             if header in dup_vals:
                 return header
