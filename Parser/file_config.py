@@ -2,7 +2,7 @@
 import logging, os
 import pandas as pd
 
-#Global classes available throughout the program
+# Class for the unchecked file (GWAS)
 class UncheckedFile:
     def __init__(self, filename, sep):
         self.filename = filename
@@ -24,11 +24,10 @@ class UncheckedFile:
     def file_to_dfcol(self, head, cols=None):
         filename = self.filename
         sep = self.sep
-        names = self.names
         df = pd.read_csv(filename, header=0, names=[head], sep=sep, usecols=cols)
         return df
 
-
+# Class for the checked file, after classify_columns
 class CheckedFile:
     def __init__(self, filename, disposed):
         self.filename = filename
@@ -61,12 +60,12 @@ class CheckedFile:
         columns = self.columns
         chunksize = int((pd.read_csv(self.get_path(columns[0]), header=0).shape[0])/2)
         chunks = int(chunksize/5000)
-        if chunksize%5000 != 0:
+        if chunksize % 5000 != 0:
             chunks += 1
         return chunks
 
     def message(self):
-        print('Process succesful! find your checked&corrected file here: {}'.format(self.filename))
+        print('Process succesful! find your checked & corrected file here: {}'.format(self.filename))
 
     def concat_write(self, head=True):
         self.get_filename()
@@ -86,50 +85,6 @@ class CheckedFile:
             concat_chunk.to_csv(filename, sep='\t', header=head, mode='a', index=False)
             head = None
         self.message()
-
-        # for chunk in pd.read_csv(self.get_path(col), header=0, chunksize=5000):
-        #     col_prev = chunk
-        #     for col in columns[1:]:
-        #         col_cur = pd.read_csv(self.get_path(col), header=0, chunksize=5000).get_chunk()
-        #         concat_chunk = pd.concat([col_prev, col_cur], axis=1)
-        #         col_prev = concat_chunk
-        #     concat_chunk.to_csv(filename, sep='\t', header=head, mode='a', index=False)
-        #     head = None
-        #self.message()
-
-
-# class CheckedFile:
-#     def __init__(self, filename, dispose):
-#         self.dispose = dispose
-#         self.filename = '{}.csv'.format(filename)
-#         self.file = open('{}'.format(filename))
-#
-#
-#     def writedf_to_file(self, df=None, header=None):
-#         filename = '{}.csv'.format(header)
-#
-#         # if os.path.isfile(filename):
-#         #     csv_input = pd.read_csv(filename, chunksize=2)
-#         #     csv_input[header] = df[header]
-#         # csv_input.to_csv('output.csv', index=False)
-#
-#         df.to_csv(filename, index=False, header=header)
-#
-#     def concat_dfs(self, csv_names):
-#
-#         pass
-
-
-# class ExceptionTemplate(Exception):
-#     def __init__(self, message, errors):
-#         # Call the base class constructor with the parameters it needs
-#         super(ExceptionTemplate, self).__init__(message)
-#
-#         # Now for your custom code...
-#         self.errors = errors
-#     #def call_usr_check(self, file, ):
-
-
 
 
 logging_config = dict(

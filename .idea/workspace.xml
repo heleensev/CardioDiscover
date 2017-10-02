@@ -2,18 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="be0d5afb-0b73-4057-a059-8156477fde82" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/file.txt" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/__init__.py" afterPath="$PROJECT_DIR$/Parser/__init__.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/__main__.py" afterPath="$PROJECT_DIR$/Parser/__main__.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/check_correct.py" afterPath="$PROJECT_DIR$/Parser/check_correct.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/classify_columns.py" afterPath="$PROJECT_DIR$/Parser/classify_columns.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/config.py" afterPath="$PROJECT_DIR$/Parser/config.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/read_GWAS.py" afterPath="$PROJECT_DIR$/Parser/read_GWAS.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/rs_liftover.py" afterPath="$PROJECT_DIR$/Parser/rs_liftover.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/App/usr_classify_columns.py" afterPath="$PROJECT_DIR$/Parser/usr_classify_columns.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/Parser/config.py" afterPath="$PROJECT_DIR$/Parser/file_config.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic.csv" afterPath="$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt" afterPath="$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/A1.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/A1.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/A2.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/A2.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/BP.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/BP.csv" />
@@ -22,6 +13,9 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/P.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/P.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/SE.csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/SE.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Datasets/Tempfiles/['SNP', 'BED'].csv" afterPath="$PROJECT_DIR$/Datasets/Tempfiles/['SNP', 'BED'].csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Parser/__init__.py" afterPath="$PROJECT_DIR$/Parser/__init__.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Parser/check_correct.py" afterPath="$PROJECT_DIR$/Parser/check_correct.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Parser/classify_columns.py" afterPath="$PROJECT_DIR$/Parser/classify_columns.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -32,7 +26,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/CardioDiscover$speed_check.coverage" NAME="speed_check Coverage Results" MODIFIED="1505585136933" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$USER_HOME$/Documents/Snippets" />
-    <SUITE FILE_PATH="coverage/CardioDiscover$__main____1_.coverage" NAME="__main__ (1) Coverage Results" MODIFIED="1506943530843" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Parser" />
+    <SUITE FILE_PATH="coverage/CardioDiscover$__main____1_.coverage" NAME="__main__ (1) Coverage Results" MODIFIED="1506952209797" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Parser" />
     <SUITE FILE_PATH="coverage/CardioDiscover$liftRsNumber.coverage" NAME="liftRsNumber Coverage Results" MODIFIED="1505378454336" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Liftover" />
     <SUITE FILE_PATH="coverage/CardioDiscover$__main__.coverage" NAME="__main__ Coverage Results" MODIFIED="1506850979264" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/App" />
     <SUITE FILE_PATH="coverage/CardioDiscover$read_GWAS.coverage" NAME="read_GWAS Coverage Results" MODIFIED="1505387498580" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Reader" />
@@ -51,28 +45,6 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="__main__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Parser/__main__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="17" column="28" lean-forward="false" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
-              <folding>
-                <element signature="e#93#118#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="processed_tag.cpd.table.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Datasets/GWAS/processed_tag.cpd.table.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="14" column="70" lean-forward="true" selection-start-line="14" selection-start-column="70" selection-end-line="14" selection-end-column="70" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Parser/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -83,11 +55,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="processed_tag.cpd.table.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="4" column="68" lean-forward="true" selection-start-line="4" selection-start-column="68" selection-end-line="4" selection-end-column="68" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="classify_columns.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Parser/classify_columns.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="471">
-              <caret line="106" column="36" lean-forward="true" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+            <state relative-caret-position="468">
+              <caret line="26" column="20" lean-forward="true" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
               <folding>
                 <element signature="e#67#85#0" expanded="true" />
               </folding>
@@ -98,8 +80,8 @@
       <file leaf-file-name="check_correct.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Parser/check_correct.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1268">
-              <caret line="32" column="37" lean-forward="true" selection-start-line="32" selection-start-column="37" selection-end-line="32" selection-end-column="37" />
+            <state relative-caret-position="-260">
+              <caret line="70" column="21" lean-forward="true" selection-start-line="70" selection-start-column="21" selection-end-line="70" selection-end-column="21" />
               <folding>
                 <element signature="e#54#72#0" expanded="true" />
               </folding>
@@ -110,51 +92,21 @@
       <file leaf-file-name="tag.cpd.table.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Datasets/GWAS/tag.cpd.table.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3600">
+            <state relative-caret-position="72">
               <caret line="4" column="69" lean-forward="false" selection-start-line="4" selection-start-column="69" selection-end-line="4" selection-end-column="69" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Parser/config.py">
+      <file leaf-file-name="file_config.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Parser/file_config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="292">
-              <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
+            <state relative-caret-position="288">
+              <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
               <folding>
                 <element signature="e#55#73#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="processed_HTN_all_ethnic.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_HTN_all_ethnic.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HTN_all_ethnic_big.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic_big.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="378">
-              <caret line="21" column="21" lean-forward="false" selection-start-line="21" selection-start-column="21" selection-end-line="21" selection-end-column="21" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HTN_all_ethnic.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-129408">
-              <caret line="56" column="106" lean-forward="false" selection-start-line="56" selection-start-column="106" selection-end-line="56" selection-end-column="106" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -195,6 +147,7 @@
       <find>df</find>
       <find>rs117872916</find>
       <find>MutableFile</find>
+      <find>identical_in</find>
     </findStrings>
     <replaceStrings>
       <replace>iter_headers</replace>
@@ -240,8 +193,9 @@
         <option value="$PROJECT_DIR$/bugs.md" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/Parser/check_correct.py" />
         <option value="$PROJECT_DIR$/Parser/config.py" />
+        <option value="$PROJECT_DIR$/Parser/file_config.py" />
+        <option value="$PROJECT_DIR$/Parser/check_correct.py" />
         <option value="$PROJECT_DIR$/Parser/classify_columns.py" />
       </list>
     </option>
@@ -743,11 +697,11 @@
       <window_info id="File Transfer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1996008" sideWeight="0.4957265" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1764706" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25490198" sideWeight="0.49679488" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2869875" sideWeight="0.49786323" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2869875" sideWeight="0.49786323" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24598931" sideWeight="0.49786323" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3368984" sideWeight="0.4957265" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3368984" sideWeight="0.4957265" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -793,58 +747,38 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
-          <line>61</line>
-          <option name="timeStamp" value="337" />
+          <line>64</line>
+          <option name="timeStamp" value="396" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
-          <line>60</line>
-          <option name="timeStamp" value="338" />
+          <line>65</line>
+          <option name="timeStamp" value="397" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>79</line>
-          <option name="timeStamp" value="373" />
+          <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
+          <line>141</line>
+          <option name="timeStamp" value="404" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>80</line>
-          <option name="timeStamp" value="374" />
+          <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
+          <line>157</line>
+          <option name="timeStamp" value="405" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>81</line>
-          <option name="timeStamp" value="375" />
+          <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="406" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>82</line>
-          <option name="timeStamp" value="377" />
+          <url>file://$PROJECT_DIR$/Parser/check_correct.py</url>
+          <line>160</line>
+          <option name="timeStamp" value="407" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>83</line>
-          <option name="timeStamp" value="379" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>85</line>
-          <option name="timeStamp" value="380" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>86</line>
-          <option name="timeStamp" value="381" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>87</line>
-          <option name="timeStamp" value="382" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Parser/config.py</url>
-          <line>84</line>
-          <option name="timeStamp" value="383" />
+          <url>file://$PROJECT_DIR$/Parser/classify_columns.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="408" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -857,7 +791,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="384" />
+      <option name="time" value="414" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -911,13 +845,6 @@
           <folding>
             <element signature="e#67#85#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/cad.add.160614.website.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="145" />
         </state>
       </provider>
     </entry>
@@ -1023,13 +950,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="4" column="70" lean-forward="false" selection-start-line="4" selection-start-column="70" selection-end-line="4" selection-end-column="70" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/bugs.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
@@ -1061,16 +981,42 @@
         <state relative-caret-position="270">
           <caret line="17" column="28" lean-forward="false" selection-start-line="17" selection-start-column="28" selection-end-line="17" selection-end-column="28" />
           <folding>
-            <element signature="e#93#118#0" expanded="true" />
+            <element signature="e#93#118#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/tag.cpd.table.txt">
+    <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_HTN_all_ethnic.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3600">
-          <caret line="4" column="69" lean-forward="false" selection-start-line="4" selection-start-column="69" selection-end-line="4" selection-end-column="69" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic_big.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="21" column="21" lean-forward="false" selection-start-line="21" selection-start-column="21" selection-end-line="21" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-129408">
+          <caret line="56" column="106" lean-forward="false" selection-start-line="56" selection-start-column="106" selection-end-line="56" selection-end-column="106" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Parser/file_config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding>
+            <element signature="e#55#73#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1090,54 +1036,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic.csv">
+    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/tag.cpd.table.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-129408">
-          <caret line="56" column="106" lean-forward="false" selection-start-line="56" selection-start-column="106" selection-end-line="56" selection-end-column="106" />
+        <state relative-caret-position="72">
+          <caret line="4" column="69" lean-forward="false" selection-start-line="4" selection-start-column="69" selection-end-line="4" selection-end-column="69" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_tag.cpd.table.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" column="68" lean-forward="true" selection-start-line="4" selection-start-column="68" selection-end-line="4" selection-end-column="68" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Parser/check_correct.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1268">
-          <caret line="32" column="37" lean-forward="true" selection-start-line="32" selection-start-column="37" selection-end-line="32" selection-end-column="37" />
+        <state relative-caret-position="-260">
+          <caret line="70" column="21" lean-forward="true" selection-start-line="70" selection-start-column="21" selection-end-line="70" selection-end-column="21" />
           <folding>
             <element signature="e#54#72#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Parser/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="81" column="0" lean-forward="false" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
-          <folding>
-            <element signature="e#55#73#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/HTN_all_ethnic_big.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="21" column="21" lean-forward="false" selection-start-line="21" selection-start-column="21" selection-end-line="21" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Datasets/Output/processed_HTN_all_ethnic.csv">
+    <entry file="file://$PROJECT_DIR$/Datasets/GWAS/cad.add.160614.website.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="145" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Parser/classify_columns.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="106" column="36" lean-forward="true" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+        <state relative-caret-position="468">
+          <caret line="26" column="20" lean-forward="true" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="20" />
           <folding>
             <element signature="e#67#85#0" expanded="true" />
           </folding>

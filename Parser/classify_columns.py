@@ -1,39 +1,41 @@
 #Module for automatic check on datatypes in the individual columns
 import re, logging
 import pandas as pd
-from Parser import config
+from Parser import file_config
 import Parser.usr_classify_columns as usr_check
 
 logger = logging.getLogger(__name__)
-MutableFile = object()
+InputFile = object()
 header_num = int()
 identical = 0
 
 col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?\d+)|'
               '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
-             ['BP', '(.*[ _-]?((pos)|(loc(ation)?))|(bp)+($|[ _-]))|(hg(\d){2})|(grch(\d){2})', '\d+'],
+             ['BP', '(pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
              ['FRQ', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?)', '(\d)*(\.)(\d)*(E)?(-)?(\d)*'],
              ['Effect', '(beta)|(effect)|(OR)|odds[ _-]?ratio', '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
              ['SE', '(se)|(std(\w)*)|((standard( -_)?)?error)', '(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
-             ['control', 'control', '[0-1000000]'],
-             ['case', '((n[ _-]?))?(studies)|(case)|$', '[0-1000000]'],
+             ['Control', 'control', '[0-1000000]'],
+             ['Case', '((n[ _-]?))?(studies)|(case)', '[0-1000000]'],
              ['P', 'p([ _-])?\.?(val)?(ue)?', '(\d)*(\.)(\d)*(E(-)?)?(\d)*']]
 
 
-def init_classifier(InputFile):
-    # MutableFile
-    global MutableFile
-    MutableFile = InputFile
-    headers, dispose = header_IDer(InputFile)
-    headers = check_essential(headers, InputFile)
-    #set new attribute headers, and columns to skip
-    MutableFile.headers = headers
-    MutableFile.skip = dispose
+def init_classifier(file):
+    # InputFile is file object in config
+    global InputFile
+    InputFile = file
+    headers, dispose = header_IDer()
+    headers = check_essential(headers)
+    # set new attribute headers, and columns to skip
+    InputFile.headers = headers
+    InputFile.skip = dispose
 
 
-def header_IDer(InputFile):
+def header_IDer():
+
+    global InputFile
 
     def allele_check():
         new_header = dup_vals_check('Allele', ['A1', 'A2'])
@@ -106,20 +108,20 @@ def header_IDer(InputFile):
 def identical_increment():
     # count occurrences of identical patterns for header and values
     # implies headers are missing from the input file
-    global MutableFile
+    global InputFile
     global identical
     identical += 1
     # if the total occurrences are more than 5, set headers to None, set names to a list filled with zeroes
     # these attributes of the UncheckedFile object, used to read the dataframe correctly in 'check_correct'
     if identical > 5:
-        MutableFile.headers = None
-        MutableFile.names = [0 for i in range(header_num)]
+        InputFile.headers = None
+        InputFile.names = [0 for _ in range(header_num)]
 
 
 def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
-    hdPattern = re.compile(r'(\s|^)({})(\s|$)'.format(rehead), re.I)
-    colPattern = re.compile(r'(\s|^)({})(\s|$)'.format(recol), re.I)
+    hdPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+(\w*[ -_])?(\s|$)'.format(rehead), re.I)
+    colPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+(\w*[ -_])?(\s|$)'.format(recol), re.I)
 
     # if 20 of 25 values match the column pattern, the type is confirmed
     cnt = 0
@@ -143,7 +145,8 @@ def col_check(df, header, rehead, recol, head=False, col=False, result=False):
     return result
 
 
-def check_essential(headers, file):
+def check_essential(headers):
+    global InputFile
     #required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', 'A1',
                 'A2', 'FRQ[12]?', 'Effect', 'P', 'SE']
@@ -160,13 +163,12 @@ def check_essential(headers, file):
                 raise ValueError
     except ValueError:
         # if essential header is not identified, user input is required
-        usr_headers = usr_check.init_usr_check(file)
+        usr_headers = usr_check.init_usr_check(InputFile)
         # after user input, check again for essential headers
-        check_essential(usr_headers, file)
+        check_essential(usr_headers, InputFile)
 
     return headers
 
-"""notes to self: headers not being replaced anymore
-
-    Todo: make a todolist, think of something for sliding columns, and other thing"""
+"""notes to self: rewrite regex like:
+(\s|^)(\w*[-_])?((pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2}))+(\w*[ -_])?(\s|$)"""
 

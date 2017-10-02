@@ -5,9 +5,9 @@ import pandas as pd
 from Parser import glob
 
 logger = logging.getLogger(__name__)
-
+InputFile = object()
 row_errors = dict()
-
+beta_values = int()
 col_types = {'SNP': '((rs[ _-]?)?\d+)|'
                     '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
              'CHR': '(\d){1,2}|[XY]',
@@ -20,14 +20,18 @@ col_types = {'SNP': '((rs[ _-]?)?\d+)|'
              'Effect': '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'SE': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'P': '(\d)*(\.)(\d)*(E)?(-)?(\d)',
-             'case': '[0-1000000]',
-             'control': '[0-1000000]'}
-
-def init_check_correct(InputFile):
-    type_checker(InputFile)
+             'Case': '[0-1000000]',
+             'Control': '[0-1000000]'}
 
 
-def type_checker(InputFile):
+def init_check_correct(file):
+    global InputFile
+    InputFile = file
+    type_checker()
+
+
+def type_checker():
+    global InputFile
     # get filename from old (UncheckedFile) file object
     filename = InputFile.filename
     # set headers in classify_columns
@@ -49,7 +53,7 @@ def type_checker(InputFile):
 
 
 def check_vals(df, head):
-
+    global InputFile
     global row_errors
 
     # specific check functions for column type in GWAS
@@ -76,7 +80,7 @@ def check_vals(df, head):
             pass
         return result
 
-    # check if human base pair number is no higher than 3,3 billigon
+    # check if human base pair number is no higher than 3,3 billion
     def bp_check(result=True):
         cur_val = val
         bp_human_genome = 3300000000
@@ -91,7 +95,10 @@ def check_vals(df, head):
         return True
 
     def effect_check():
-        #check for beta val or odds ratio, minus
+        #check for beta val: regression coefficient or odds ratio: exp(beta)
+        global beta_values
+        if match.group(1):
+            beta_values += 1
         return True
 
     def pval_check():
@@ -103,9 +110,21 @@ def check_vals(df, head):
     def sample_control_check():
         return True
 
+    def effect_type():
+        if column == 'effect':
+            size = (df.shape[0]) / 2
+            if beta_values > size / 100:
+                return 'Beta'
+            elif beta_values > 0:
+                df.replace('(-)(\d)*(\.)', str(np.NaN), regex=True, inplace=True)
+                return 'OR'
+            else:
+                return 'OR'
+
     def row_errors_append():
         # count number of errors for one row in a dictionary
         row_errors[str(i)] = row_errors.get(str(i), 0) + 1
+
     # corresponding check functions for the individual headers
     check_funcs = {'SNP': rs_check, 'CHR': chr_check, 'BP': bp_check, 'A1': allele_check,
                    'A2': allele_check, 'FRQ1': freq_check, 'FRQ2': freq_check,
@@ -132,18 +151,22 @@ def check_vals(df, head):
             if not passed:
                 passed = str(np.NaN)
                 row_errors_append()
-            elif ' ' in val:
-                passed = val.strip()
             else:
-                # if matched, passed and not stripped, don't replace value
-                continue
-            df.replace(val, passed)
+                if ' ' in val:
+                    passed = val.strip()
+                # if no new value is returned, but passed is True, continue to the next item in loop
+                elif not isinstance(passed, str):
+                    continue
+            df.replace(val, passed, inplace=True)
         else:
             # if not matched with general pattern, set value to NaN
-            df.replace(val, str(np.NaN))
+            df.replace(val, str(np.NaN), inplace=True)
             row_errors_append()
 
-    if column == 'SNP':
+    if head == 'effect':
+        head = effect_type()
+
+    elif column == 'SNP':
         df = df.append(BED)
         head = [head, 'BED']
 
