@@ -33,15 +33,19 @@ class CheckedFile:
         self.filename = filename
         self.disposed = disposed
         self.columns = list()
+        self.orientation = dict()
 
-    def column_names(self, name):
+    def update_column_names(self, name):
         columns = self.columns
         columns.append(name)
+
+    def update_orientation(self, orient):
+        self.orientation = orient
 
     def write_to_file(self, df, name):
         name = '{}.csv'.format(name)
         df.to_csv(self.get_path(name), index=False, header=name)
-        self.column_names(name)
+        self.update_column_names(name)
 
     def get_filename(self):
         file_wo_path = self.filename.split('/')[-1]
@@ -104,5 +108,3 @@ logging_config = dict(
         'level': logging.DEBUG,
     },
 )
-
-"""fix writing to csv in chunks in CheckedFile, use csv reader"""

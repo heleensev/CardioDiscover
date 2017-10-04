@@ -14,12 +14,13 @@ The application consists of several modules:
 * Gene mapper
 * Drugability tester
 
+
 ###### Flowchart
 ![Image of Logo](https://github.com/LucilleWerner/CardioDiscover/blob/master/Images/cardio_discover_flow.png)
 
 #### Current State
- Nearly finished, jk.
- - [ ] Parser: (90%)
+
+ - [X] Parser
  - [ ] Liftover tool
  - [ ] Statistical tester
  - [ ] Gene mapper

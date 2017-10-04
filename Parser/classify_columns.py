@@ -1,7 +1,5 @@
 #Module for automatic check on datatypes in the individual columns
 import re, logging
-import pandas as pd
-from Parser import file_config
 import Parser.usr_classify_columns as usr_check
 
 logger = logging.getLogger(__name__)
@@ -14,11 +12,11 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2})', '\d+'],
              ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGDI]{1}($|(\s))'],
-             ['FRQ', '(([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?)', '(\d)*(\.)(\d)*(E)?(-)?(\d)*'],
+             ['FRQ', '([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?', '(\d)*(\.)(\d)*(E)?(-)?(\d)*'],
              ['Effect', '(beta)|(effect)|(OR)|odds[ _-]?ratio', '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
              ['SE', '(se)|(std(\w)*)|((standard( -_)?)?error)', '(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
              ['Control', 'control', '[0-1000000]'],
-             ['Case', '((n[ _-]?))?(studies)|(case)', '[0-1000000]'],
+             ['Case', '(N)|(studies)|(case)', '[0-1000000]'],
              ['P', 'p([ _-])?\.?(val)?(ue)?', '(\d)*(\.)(\d)*(E(-)?)?(\d)*']]
 
 
@@ -120,8 +118,8 @@ def identical_increment():
 
 def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
-    hdPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+(\w*[ -_])?(\s|$)'.format(rehead), re.I)
-    colPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+(\w*[ -_])?(\s|$)'.format(recol), re.I)
+    hdPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+([ -_]\w*)?(\s|$)'.format(rehead), re.I)
+    colPattern = re.compile(r'(\s|^)(\w*[ -_])?({})+([ _-]\w*[ -_])?(\s|$)'.format(recol), re.I)
 
     # if 20 of 25 values match the column pattern, the type is confirmed
     cnt = 0
@@ -149,7 +147,7 @@ def check_essential(headers):
     global InputFile
     #required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', 'A1',
-                'A2', 'FRQ[12]?', 'Effect', 'P', 'SE']
+                'A2', 'FRQ', 'Effect', 'P', 'SE']
     for head in headers:
         print(head)
     try:
@@ -169,6 +167,4 @@ def check_essential(headers):
 
     return headers
 
-"""notes to self: rewrite regex like:
-(\s|^)(\w*[-_])?((pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2}))+(\w*[ -_])?(\s|$)"""
 

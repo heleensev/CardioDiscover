@@ -1,26 +1,22 @@
 import logging
 
-#RAF(risk allele freq == MAF??), wat te doen met CAF (coded allele freq) == minor allele freq?
-#RAF EAF MAF CAF
 logger = logging.getLogger(__name__)
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
-                   'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
-                   'effect allele frequency': 'EAf', 'major allele frequency': 'JAF',
-                   'non-effect allele frequency' : 'NAF', 'minor allele frequency': 'MAF', 'effect/risk allele':
-                   'effect_allele', 'major allele': 'major_allele', 'non-effect allele': "non_effect_allele",
-                   'minor allele': 'minor_allele', 'position or location of SNP': 'BP', 'chromosome number': 'CHR',
-                   'rsID of marker or SNP': 'marker_original'}
+                       'samplesize cases': 'case', 'P-value' : 'P', 'effect size or Beta': 'Beta',
+                       '(minor)allele frequency': 'FRQ', 'effect/minor allele': 'A1', 'major/non_effect allele': 'A2',
+                       'position or location of SNP': 'BP', 'chromosome number': 'CHR', 'rsID of marker or SNP': 'SNP'}
 header_info = [['rsID of marker or SNP', 1], ['chromosome number', 2], ['location of SNP', 3],
-               ['strand orientation', 4], ['effect allele', 5], ['major allele', 6], ['non-effect allele', 7],
-               ['minor allele', 8], ['effect allele frequency', 9], ['major allele frequency', 10],
-               ['non-effect allele frequency', 11], ['minor allele frequency', 12], ['effect size or Beta', 13],
-               ['standard error', 14], ['P-value', 15], ['case samplesize', 16], ['control samplesize', 17],
-               ['additional info', 18]]
+               ['strand orientation', 4], ['effect/minor allele', 5], ['non_effect/major allele', 6],
+               ['minor allele', 7], ['effect allele frequency', 8], ['major allele frequency', 9],
+               ['allele frequency', 10], ['effect size or Beta', 11], ['standard error', 12],
+               ['P-value', 13], ['case sample size', 14], ['control sample size', 15], ['additional info', 16]]
 header_dict = {''}
+
 
 def init_usr_check(file):
     headers = column_unifier(file)
     return headers
+
 
 def column_unifier(file):
     logger.info("entering column_unifier\n")
@@ -28,16 +24,10 @@ def column_unifier(file):
     print("Automatic column parsing not succesful. Help me, human?")
     skip = input("Skip column check? Y/N\n")
     while True:
+        # if user chooses to skip the check, condition is false
         if skip.upper() == "N":
-            
             df = file.file_to_df(chsize=5)
             headers = df.columns.values
-            usr_headers = []
-            # global file_nm
-            # print("file name: {}\nThe headers of this file are: ".format(str(all_files[file_nm])))
-            # for i, header in enumerate(headers):
-            #     print("{}\t{}\n".format(str(i),header))
-
             new_headers = df.columns.values
             global replacement_headers
             global header_info
@@ -79,7 +69,6 @@ def column_unifier(file):
 
 
 def print_table():
-
     global header_info
 
     iter_headers = iter(header_info)
@@ -96,18 +85,5 @@ def print_table():
         except StopIteration:
             print("stop iteration")
     print("\n")
-
-
-def getsomeBEDs(df):
-
-    # rs_col = df["markername"].tolist()
-    # print(rs_col)
-    pass
-
-def get_some_rss(df):
-
-    rscol = df.columns.values.tolist()[0]
-    #rs_output = open("cad_rs.txt", 'a')
-    df[rscol].to_csv("cad_rs.csv", index=False, mode='a')
 
 

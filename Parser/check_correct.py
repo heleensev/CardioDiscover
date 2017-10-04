@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 InputFile = object()
 row_errors = dict()
 beta_values = int()
+
 col_types = {'SNP': '((rs[ _-]?)?\d+)|'
                     '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
              'CHR': '(\d){1,2}|[XY]',
@@ -36,7 +37,7 @@ def type_checker():
     filename = InputFile.filename
     # set headers in classify_columns
     org_headers = InputFile.headers
-    #columns to skip
+    # columns to skip in check and csv writing
     disposed = InputFile.skip
     print('disposed: {}'.format(disposed))
     # create new file object, contains attributes for the processed output file
@@ -55,41 +56,59 @@ def type_checker():
 def check_vals(df, head):
     global InputFile
     global row_errors
+    BED = pd.DataFrame
+
+    def head_operation():
+        # check if SNP column: add BED column
+        global BED
+        if column == 'SNP':
+            # create extra column for values in BED format in SNP column
+            nan_values = [np.NaN for _ in df.itertuples()]
+            BED = pd.DataFrame({'BED': nan_values})
+
+    def tail_operation():
+        global head
+        global df
+        # check if header is 'effect', determine the type of unit
+        if head == 'effect':
+            head = effect_type()
+        elif column == 'SNP':
+            df = df.append(BED)
+            head = [head, 'BED']
 
     # specific check functions for column type in GWAS
     def rs_check(result=True):
         # check if rs prefix is present, if not, return concatenated value
         cur_val = val
         df_BED = BED
-        if not match.group(4):
-            new_val = 'rs{}'.format(cur_val.strip())
-            return new_val
         # if SNP pattern matches with BED format, insert into BED column
-        elif match.group(5):
+        if match.group(5):
             df_BED.iloc[i] = match.group(5)
             result = False
+        elif not match.group(4):
+            result = 'rs{}'.format(cur_val.strip())
         return result
 
     def chr_check(result=True):
         # check if autosomal chromosome number is no higher than 22
-        cur_val = val
-        if isinstance(cur_val, int) and cur_val > 23:
+        global val
+        if isinstance(val, int) and val > 23:
             result = False
-        elif int(cur_val) == 23:
+        elif int(val) == 23:
             #replace with X/Y????
             pass
         return result
 
     # check if human base pair number is no higher than 3,3 billion
     def bp_check(result=True):
-        cur_val = val
+        global val
         bp_human_genome = 3300000000
-        if cur_val > bp_human_genome:
+        if val > bp_human_genome:
             result = False
         return result
 
     def allele_check():
-        return True
+        pass
 
     def freq_check():
         return True
@@ -97,6 +116,7 @@ def check_vals(df, head):
     def effect_check():
         #check for beta val: regression coefficient or odds ratio: exp(beta)
         global beta_values
+        #if the value of the 'Effect' column is negative, probably a Beta, as oppposed to OR
         if match.group(1):
             beta_values += 1
         return True
@@ -130,14 +150,9 @@ def check_vals(df, head):
                    'A2': allele_check, 'FRQ1': freq_check, 'FRQ2': freq_check,
                    'Effect': effect_check, 'P': pval_check, 'SE': se_check,
                    'control': sample_control_check, 'case': sample_control_check}
-
     column = head
-    if column == 'SNP':
-        # create extra column for values in BED format in SNP column
-        #df.insert(n, 'BED', None)
-        nan_values = [np.NaN for i in df.itertuples()]
-        BED = pd.DataFrame({'BED': nan_values})
-
+    head_operation()
+    # get the specific pattern for the column type for dic 'col_types'
     pattern = col_types.get(head)
     for i, (row, val) in enumerate(df.itertuples()):
         val = str(val)
@@ -162,13 +177,8 @@ def check_vals(df, head):
             # if not matched with general pattern, set value to NaN
             df.replace(val, str(np.NaN), inplace=True)
             row_errors_append()
-
-    if head == 'effect':
-        head = effect_type()
-
-    elif column == 'SNP':
-        df = df.append(BED)
-        head = [head, 'BED']
+    # some operations to be done at end of the loop, depending on column type
+    tail_operation()
 
     return df, head
 
