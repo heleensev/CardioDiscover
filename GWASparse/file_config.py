@@ -56,7 +56,7 @@ class CheckedFile:
             open(self.filename, 'w').close()
 
     def get_path(self, filename):
-        outputdir = '/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Tempfiles/'
+        outputdir = '/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Parser/Tempfiles/'
         fpath = outputdir + filename
         return os.path.join(os.path.dirname(__file__), fpath)
 
@@ -79,7 +79,7 @@ class CheckedFile:
         # pd.read replace by methods, make it cleaner
         chunks = self.get_chunksize()
         concat_chunk = pd.DataFrame
-
+        # use memory_map param for better performance?
         for _ in range(chunks):
             col_prev = pd.read_csv(self.get_path(columns[0]), header=0, chunksize=5000).get_chunk()
             for col in columns[1:]:

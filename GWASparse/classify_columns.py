@@ -1,6 +1,6 @@
 #Module for automatic check on datatypes in the individual columns
 import re, logging
-import Parser.usr_classify_columns as usr_check
+import GWASparse.usr_classify_columns as usr_check
 
 logger = logging.getLogger(__name__)
 InputFile = object()

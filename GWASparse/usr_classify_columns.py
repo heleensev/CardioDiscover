@@ -14,58 +14,56 @@ header_dict = {''}
 
 
 def init_usr_check(file):
-    headers = column_unifier(file)
-    return headers
-
-
-def column_unifier(file):
-    logger.info("entering column_unifier\n")
-
     print("Automatic column parsing not succesful. Help me, human?")
     skip = input("Skip column check? Y/N\n")
     while True:
         # if user chooses to skip the check, condition is false
         if skip.upper() == "N":
-            df = file.file_to_df(chsize=5)
-            headers = df.columns.values
-            new_headers = df.columns.values
-            global replacement_headers
-            global header_info
-
-            print("len headers: ", len(header_info))
-
-            for i, header in enumerate(headers):
-                print_table()
-                print(df[[header]][0:5])
-                print("Please type the number of the corresponding description of the information in this column. "
-                      "If the description is not available, then it's not relevant, type: N")
-                try_again = True
-                while try_again:
-                    cor_nm = str(input())
-                    if cor_nm.isdigit():
-                        new_headers[i] = replacement_headers.get(header_info[int(cor_nm)-1][0])
-                        try_again = False
-                    elif cor_nm.upper() == "N":
-                        try_again = False
-                    else:
-                        "Seems like you failed to type a number, please try again"
-                    print('If you made a mistake press any key for the following input, else: press ENTER')
-                    not_done = input()
-                    if not_done:
-                        try_again = True
-                        print("Please type the number of the corresponding description of the information in this column. "
-                              "If the description is not available, then it's not relevant, type: N")
-
-            print(df.columns.values)
-
-            return new_headers
-
-            # with pd.option_context('max_rows',10):
-            #     print(df)
+            headers = column_unifier(file)
+            return headers
         elif skip.upper() == "Y":
             return
         else:
             print("Y or N please\n")
+
+
+def column_unifier(file):
+    logger.info("entering column_unifier\n")
+
+    df = file.file_to_df(chsize=5)
+    headers = df.columns.values
+    new_headers = df.columns.values
+    global replacement_headers
+    global header_info
+
+    print("len headers: ", len(header_info))
+
+    for i, header in enumerate(headers):
+        print_table()
+        print(df[[header]][0:5])
+        print("Please type the number of the corresponding description of the information in this column. "
+              "If the description is not available, then it's not relevant, type: N")
+        try_again = True
+        while try_again:
+            cor_nm = str(input())
+            if cor_nm.isdigit():
+                new_headers[i] = replacement_headers.get(header_info[int(cor_nm)-1][0])
+                try_again = False
+            elif cor_nm.upper() == "N":
+                try_again = False
+            else:
+                "Seems like you failed to type a number, please try again"
+            print('If you made a mistake press any key for the following input, else: press ENTER')
+            not_done = input()
+            if not_done:
+                try_again = True
+                print("Please type the number of the corresponding description of the information in this column. "
+                      "If the description is not available, then it's not relevant, type: N")
+
+    print(df.columns.values)
+
+    return new_headers
+
 
 
 def print_table():

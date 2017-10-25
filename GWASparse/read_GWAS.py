@@ -1,5 +1,5 @@
 import os, re, logging
-from Parser import glob
+from GWASparse import glob
 
 
 df_buffer = dict()
@@ -48,7 +48,7 @@ def parse_input(user_input):
         file_nm = int(num)
         logger.info("Processing file number {}".format(file_nm + 1))
         # call get_path to get absolute path of input file
-        file = get_path("../Datasets/GWAS/", file)
+        file = get_path("../Datasets/Parser/GWAS/", file)
         # return file to input_prompt
         return file
 
@@ -59,11 +59,11 @@ def open_file(file):
     # read first line of file, if line is longer than 300, probably not a header line or line \
     # was not proper split because of lacking new lines
     with open(filename) as fin:
-        header = fin.readline(300)
+        header = fin.readline(500)
         if header:
             return header
         else:
-            print("file does not contain newlines, that's not going to work")
+            print("file does not contain newlines, or has extremely long lines, that's not going to work")
             exit(1)
 
 
@@ -97,13 +97,4 @@ def check_sep(file):
         print("no valid separator found")
         exit(1)
 
-
-
-    # loc_names = ['bp_hg19', 'Physical_Location', 'BP']
-    #
-    # dflist = df["Physical_Location"].tolist()
-    #
-    # lo = liftover('hg17', 'hg18')
-    # for location in dflist:
-    #     print(lo.convert_coordinate('chr1', location))
 

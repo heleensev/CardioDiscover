@@ -3,9 +3,9 @@
 # from logging.config import dictConfig
 #package imports
 
-from Parser import reader
-from Parser import classifier
-from Parser import checker
+from GWASparse import reader
+from GWASparse import classifier
+from GWASparse import checker
 
 def main():
 
