@@ -9,20 +9,24 @@
 #### Structure
 The application consists of several modules:
 * GWAS parser
-* Liftover tool
+* RNAseq parser
+* SNP conformer
 * Statistical tester
 * Gene mapper
 * Drugability tester
+* SNP ranker
 <br><br>
 ##### Flowchart
 ![Image of Logo](https://github.com/LucilleWerner/CardioDiscover/blob/master/Images/cardio_discover_flow.png)
 
 #### Current State
 
- - [X] Parser
- - [ ] Liftover tool
+ - [X] GWASParser
+ - [ ] RNAseq parser
+ - [ ] SNP conformer
  - [ ] Statistical tester
  - [ ] Gene mapper
  - [ ] Drugability tester
+ - [ ] SNP ranker
 
 

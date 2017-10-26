@@ -1,5 +1,5 @@
 import os, re, logging
-from GWASparse import glob
+from GWASParse import glob
 
 
 df_buffer = dict()

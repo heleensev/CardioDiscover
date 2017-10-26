@@ -2,7 +2,7 @@
 import re, logging
 import numpy as np
 import pandas as pd
-from GWASparse import glob
+from GWASParse import glob
 
 logger = logging.getLogger(__name__)
 InputFile = object()

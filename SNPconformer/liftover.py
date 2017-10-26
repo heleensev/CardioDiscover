@@ -13,10 +13,10 @@ def init_collection():
     collection = DbQuerier('../DB/GWAS').db_collection('SNPliftover')
 
 def liftover_check(SNP, gwas_set, chk_num):
-
     global collection
     global liftover_sum, nohit_sum
     logger.info('initiating SNP conformer at {}'.format(get_time()))
+
     try:
         match = collection.fetch('rs_low', SNP)
         if match:
