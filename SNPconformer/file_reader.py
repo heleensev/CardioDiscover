@@ -34,7 +34,7 @@ def iterate_file(chnk_num, GWAS_set, SNP='SNP', i=0):
     try:
         for i, _, _, SNP, BP, _, _, A1, A2, FRQ, effect, SE, P in GWAS_set:
             liftover.liftover_check(SNP, GWAS_set, chnk_num)
-            SNP1000ref.reference_check(SNP, BP, A1, A2, FRQ, GWAS_set, chnk_num)
+            SNP1000ref.reference_check(SNP, BP, A1, A2, FRQ, effect, GWAS_set, chnk_num)
     except:
         logger.error(sys.exc_info())
         logger.error('during parseRsmerge at chunk {}, at SNP {}, at row {}'.format(chnk_num, SNP, i))

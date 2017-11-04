@@ -1,0 +1,20 @@
+{
+  'experimental GWAS':
+    [
+      {
+        'path':
+       ,'n_studies':
+       ,'phenotype':
+       ,'ethnicity':
+      }
+    ]
+  'additional phenotype GWAS':
+  [
+    {
+      'path':
+     ,'n_studies':
+     ,'phenotype':
+     ,'ethnicity':
+    }
+  ]
+}

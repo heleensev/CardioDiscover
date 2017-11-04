@@ -7,13 +7,14 @@ filename = str()
 logger = logging.getLogger(__name__)
 all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
-def init_reader():
+def init_reader(this_study):
     logger.info("Entering read_GWAS")
     # call input_prompt for user input
-    selected_file = input_prompt()
-    sep = check_sep(selected_file)
-
-    InputFile = glob.UncheckedFile(selected_file, sep)
+    #selected_file = input_prompt()
+    #sep = check_sep(selected_file)
+    study_path = this_study.study_path
+    sep = check_sep(study_path)
+    InputFile = glob.UncheckedFile(study_path, sep)
 
     return InputFile
 
