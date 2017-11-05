@@ -6,11 +6,21 @@ from MetaReader.config import study
 logger = logging.getLogger(__name__)
 
 def read_meta(path):
-    files = list()
     try:
         with open(path) as json_file:
             meta_file = json.load(json_file)
         # for all the studies in the meta data file
+        return meta_file
+    except FileNotFoundError:
+        logger.info('meta_study file not found')
+    except JSONDecodeError:
+        logger.info('problem loading meta data json file')
+
+
+def meta_studies(path):
+    files = list()
+    try:
+        meta_file = read_meta(path)
         for studyID in meta_file:
             study_path = studyID.get('path')
             study_size = studyID.get('study_size')
@@ -28,9 +38,5 @@ def read_meta(path):
             files.append(this_study)
         # return the list with study objects
         return files
-    except FileNotFoundError:
-        logger.info('meta_study file not found')
-    except JSONDecodeError:
-        logger.info('problem loading meta data json file')
     except Exception as e:
         logger.info('')

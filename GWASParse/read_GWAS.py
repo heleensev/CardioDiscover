@@ -14,9 +14,10 @@ def init_reader(this_study):
     #sep = check_sep(selected_file)
     study_path = this_study.study_path
     sep = check_sep(study_path)
-    InputFile = glob.UncheckedFile(study_path, sep)
+    # new UncheckedFile object, with path and seperator as attributes
+    GWASin = glob.UncheckedFile(study_path, sep)
 
-    return InputFile
+    return GWASin
 
 
 def get_path(fdir, fpath):

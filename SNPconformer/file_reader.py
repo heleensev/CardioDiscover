@@ -24,15 +24,15 @@ def init_file_reader():
 
 def read_file(file, chsize):
     logger.info('initiating read_file at {}'.format(get_time()))
-    for chnk_num, chunk in enumerate(pd.read_csv(file, chunksize=chsize, header=None, sep='\t')):
+    for chnk_num, GWAS_set in enumerate(pd.read_csv(file, chunksize=chsize, header=None, sep='\t')):
         print("entering file {}: chunk: {}".format(file, chnk_num))
-        iterate_file(chnk_num, GWAS_set=chunk.itertuples(index=True))
+        iterate_file(chnk_num, GWAS_set.itertuples(index=True), GWAS_set)
 
 
-def iterate_file(chnk_num, GWAS_set, SNP='SNP', i=0):
+def iterate_file(chnk_num, GWAS_chnk, GWAS_set, SNP='SNP', i=0):
     logger.info('initiating iterate_file at {}'.format(get_time()))
     try:
-        for i, _, _, SNP, BP, _, _, A1, A2, FRQ, effect, SE, P in GWAS_set:
+        for i, _, _, SNP, BP, _, _, A1, A2, FRQ, effect, SE, P in GWAS_chnk:
             liftover.liftover_check(SNP, GWAS_set, chnk_num)
             SNP1000ref.reference_check(SNP, BP, A1, A2, FRQ, effect, GWAS_set, chnk_num)
     except:

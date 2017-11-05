@@ -3,7 +3,7 @@ import re, logging
 import GWASParse.usr_classify_columns as usr_check
 
 logger = logging.getLogger(__name__)
-InputFile = object()
+GWASin = object()
 header_num = int()
 identical = 0
 
@@ -11,7 +11,7 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
               '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)'],
              ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
              ['BP', '(pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2})', '\d+'],
-             ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGRDI]{1}($|(\s))'],
+             ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGRDI]+($|(\s))'],
              ['FRQ', '([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?', '(\d)*(\.)(\d)*(E)?(-)?(\d)*'],
              ['Effect', '(beta)|(effect)|(OR)|odds[ _-]?ratio', '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
              ['SE', '(se)|(std(\w)*)|((standard( -_)?)?error)', '(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
@@ -23,7 +23,7 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
 
 def init_classifier(file):
     # InputFile is file object in config
-    global InputFile
+    global GWASin
     InputFile = file
     headers, dispose = header_IDer()
     headers = check_essential(headers)
@@ -33,7 +33,7 @@ def init_classifier(file):
 
 
 def header_IDer():
-    global InputFile
+    global GWASin
     try:
         def allele_check():
             new_header = dup_vals_check('Allele', ['A1', 'A2'])
@@ -131,7 +131,7 @@ def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
 
 def check_essential(headers):
-    global InputFile
+    global GWASin
     #required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', 'A1',
                 'A2', 'FRQ', 'Effect', 'P', 'SE']

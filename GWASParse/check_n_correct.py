@@ -12,7 +12,7 @@ study_size = int()
 # sum of effective size
 eff_sum = float()
 # object containing attrubutes of the input file
-InputFile = object()
+GWASin = object()
 # counter for rows with issues, these are dropped from the set
 row_errors = dict()
 # counter for negative effect values, used to determine if effect
@@ -29,8 +29,8 @@ col_types = {'SNP': '((rs[ _-]?)?\d+)|'
                     '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
              'CHR': '(\d){1,2}|[XY]',
              'BP': '\d{10}',
-             'A1': '[ATCGRDI]{1}',
-             'A2': '[ATCGRDI]{1}',
+             'A1': '[ATCGRDI]+',
+             'A2': '[ATCGRDI]+',
              'FRQ': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'FRQ1': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'Effect': '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*',
@@ -42,61 +42,57 @@ col_types = {'SNP': '((rs[ _-]?)?\d+)|'
 
 
 def init_check_correct(file, study):
-    global InputFile
+    global GWASin
     global study_size
     study_size = study.study_size
-    InputFile = file
+    GWASin = file
     type_checker()
-    write_meta(study)
+    # get additional meta data about study
+    add_meta = get_meta_items()
+    return add_meta
 
 
 def type_checker():
-    global InputFile
+    global GWASin
     # get filename from old (UncheckedFile) file object
-    filename = InputFile.filename
+    filename = GWASin.filename
     # set headers in classify_columns
-    org_headers = InputFile.headers
+    org_headers = GWASin.headers
     # columns to skip in check and csv writing
-    disposed = InputFile.skip
+    disposed = GWASin.skip
     print('disposed: {}'.format(disposed))
     # create new file object, contains attributes for the processed output file
-    CheckedFile = glob.CheckedFile(filename, disposed)
+    GWASout = glob.CheckedFile(filename, disposed)
     # all column headers without disposed columns
     headers = [x for i, x in enumerate(org_headers) if i not in disposed]
-    # for header in headers of InputFile except for the disposed columns
+    # for header in headers of GWASin except for the disposed columns
     for head in headers:
         n = org_headers.index(head)
-        df = InputFile.file_to_dfcol(head=head, cols=[n])
+        df = GWASin.file_to_dfcol(head=head, cols=[n])
         df, head = check_vals(df, head)
         # write checked column to a temporary file
-        CheckedFile.write_to_file(df, head)
+        GWASout.write_to_file(df, head)
 
     # write temporary files (columns) to one csv file
-    CheckedFile.concat_write()
-    # write meta data about study to json file
-    update_study_meta()
+    GWASout.concat_write()
 
 
-def update_study_meta():
-    pass
+def get_meta_items():
     # should be adding attribute to the object
     # add to meta data file if info score is present and fixed or not
-    # if info_fixed:
-    #     if first_info:
-    #         info = first_info
-    #     else:
-    #         info = 'NONE'
-    # else:
-    #     info = 'VARIABLE'
-    # meta_file['info_score'] = info
-    # # add sum of effective sample size to meta data
-    # meta_file['sum_effective_size'] = eff_sum
-    # # write modified meta data to json file
-    # json.dumps('')
-    #
+    if info_fixed:
+        if first_info:
+            info = first_info
+        else:
+            info = 'NONE'
+    else:
+        info = 'VARIABLE'
+
+    return {'info_score': info, 'sum_effective_size': eff_sum}
+
 
 def check_vals(df, head):
-    global InputFile, row_errors
+    global GWASin, row_errors
     BED = pd.DataFrame
 
     def head_operation():
@@ -202,29 +198,20 @@ def check_vals(df, head):
         return True
 
     def info_check():
-        global val, eff_sum
-
+        global val, eff_sum, info_fixed
+        # info score must be between 1 and 0, because it is a percentage
         if 0 >= val <= 1:
-            ratio = val
+            ratio = float(val)
         else:
             ratio = 1
-        sample_size_eff = sample_size * ratio
+        sample_size_eff = float(study_size * ratio)
         eff_sum += sample_size_eff
-        """
-          if ( $study_okay[$study] == 1 ) {
-        #        print STDERR " *** DEBUG *** Examining sample size for [ $study_name[$study] ]: n = $sample_size[$study] and info = $ratio[$study].\n";
-          $sample_size_eff[$study] = $sample_size[$study] * ( $ratio[$study] > 1 ? 1 : $ratio[$study] );
-          $n_eff += $sample_size_eff[$study];
-          $n_okay_studies++;
-        """
 
-        # # info score must be between 1 and 0, because it is a percentage
-        # global val
-        # if 0 >= val <= 1:
-        #     # if the info value is not the same as the one from the first row, change bool
-        #     if (val != first_info) and info_fixed:
-        #         info_fixed = False
-        #     return True
+        # if the info value is not the same as the one from the first row, change bool
+        if (val != first_info) and info_fixed:
+            info_fixed = False
+        # if val not 0 < val < 1 then make first_info False, so meta info = NONE
+        return True
 
     def effect_type():
         # removed the head == 'effect' check
