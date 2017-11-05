@@ -1,9 +1,11 @@
-#Module for automatic check on datatypes in the individual columns
+# Module for automatic check on datatypes in the individual columns
 import re, logging
 import GWASParse.usr_classify_columns as usr_check
+from DataFrameHandler.config import file_to_dataframe
 
 logger = logging.getLogger(__name__)
-GWASin = object()
+path = str
+sep = str
 header_num = int()
 identical = 0
 
@@ -21,15 +23,16 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
              ['Info', '(info)|(imputation)|(variance)', '(\d)*(\.)(\d)*(E)?(-)?(\d)*']]
 
 
-def init_classifier(file):
-    # InputFile is file object in config
-    global GWASin
-    InputFile = file
+def init_classifier(study):
+    global path, sep
+    path = study.get('path')
+    sep = study.get('sep')
     headers, dispose = header_IDer()
-    headers = check_essential(headers)
+    check_essential(headers)
     # set new attribute headers, and columns to skip
-    InputFile.headers = headers
-    InputFile.skip = dispose
+    study.update({'headers': headers, 'skip': dispose})
+
+    return study
 
 
 def header_IDer():
@@ -62,12 +65,12 @@ def header_IDer():
                     return False
                 else:
                     # if the duplicate header is not an allele or a frequency raise error
-                    raise ValueError
+                    raise Exception('Duplicate header detected, proceeding to user column check')
             else:
                 return True
 
         # transform first line of the csv to a DataFrame, to determine the headers
-        df = InputFile.file_to_df(chsize=1)
+        df = file_to_dataframe(path=path, sp=sep, ch=25)
         headers = df.columns.values.tolist()
         global header_num
         header_num = len(headers)
@@ -77,13 +80,14 @@ def header_IDer():
         for i, header in enumerate(headers):
             print(i)
             # get a chunk of the column to perform the check (for memory efficiency)
-            df = InputFile.file_to_df(cols=[i], chsize=25)
             for c, col in enumerate(col_types):
                 if col_check(df, header, col[1], col[2]):
                     new_header = col[0]
                     # call duplicate check for duplicate headers
                     if new_header == 'Allele':
                         new_header = allele_check()
+                        headers[i] = new_header
+                        break
                     elif duplicate_check(new_header):
                         # replace old header in list with new header
                         headers[i] = new_header
@@ -94,14 +98,13 @@ def header_IDer():
                 dispose.append(i)
 
         return headers, dispose
-    except NoHeadersException:
-        logger.error('Header missing for column, continuing to user_classify_columns')
-        check_essential([])
     except ValueError:
         # if duplicate header is not allele, let user check the columns
         check_essential([])
     except Exception as e:
-        logger.error("")
+        logger.error(e)
+        check_essential([])
+
 
 def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
@@ -122,7 +125,7 @@ def col_check(df, header, rehead, recol, head=False, col=False, result=False):
     # if the type is confirmed, but not the header, header may actually  be a row value
     # implies header is missing from the input file, call identical_increment to count occurrences
     elif col and colPattern.match(header):
-        raise NoHeadersException
+        raise Exception('Header missing for column, continuing to user_classify_columns')
     # if header or column matches with the pattern, header is confirmed
     if head and col:
         result = True
@@ -146,9 +149,9 @@ def check_essential(headers):
                 raise ValueError
     except ValueError:
         # if essential header is not identified, user input is required
-        usr_headers = usr_check.init_usr_check(InputFile)
+        usr_headers = usr_check.init_usr_check(path)
         # after user input, check again for essential headers
-        check_essential(usr_headers, InputFile)
+        check_essential(usr_headers, path)
     except Exception as e:
         logger.error("")
 

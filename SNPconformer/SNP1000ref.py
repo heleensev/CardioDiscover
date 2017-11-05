@@ -155,4 +155,5 @@ def reference_check(SNP, BP, A1, A2, FRQ, beta, GWAS_set, chnk_num):
 
 """
 check order unpacking of values from iterable after reading file
+rs ID may not be present in the file, so no liftover, but alleles and frequency may be checked
 """

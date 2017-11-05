@@ -25,14 +25,12 @@ first_info = float()
 info_fixed = True
 
 # patterns for the individual columns that may be present in dataset
-col_types = {'SNP': '((rs[ _-]?)?\d+)|'
-                    '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)',
+col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
              'CHR': '(\d){1,2}|[XY]',
              'BP': '\d{10}',
              'A1': '[ATCGRDI]+',
              'A2': '[ATCGRDI]+',
              'FRQ': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
-             'FRQ1': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'Effect': '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'SE': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
              'P': '(\d)*(\.)(\d)*(E)?(-)?(\d)',
@@ -93,39 +91,29 @@ def get_meta_items():
 
 def check_vals(df, head):
     global GWASin, row_errors
-    BED = pd.DataFrame
 
     def head_operation():
-        # check if SNP column: add BED column
-        global BED, first_info
-        if head == 'SNP':
-            # create extra column for values in BED format in SNP column
-            nan_values = [np.NaN for _ in df.itertuples()]
-            BED = pd.DataFrame({'BED': nan_values})
+        global first_info
         # get the info score of the first row
         if head == 'Info':
-            first_info= float(df.iloc[0])
+            first_info = float(df.iloc[0])
 
     def tail_operation():
         global head, df
         # check if current header is 'effect', determine the type of unit
         if head == 'effect':
             effect_type()
-        elif head == 'SNP':
-            df = df.append(BED)
-            head = [head, 'BED']
 
     # specific check functions for column type in GWAS
     def rs_check(result=True):
         # check if rs prefix is present, if not, return concatenated value
         cur_val = val
-        df_BED = BED
-        # if SNP pattern matches with BED format, insert into BED column
-        if match.group(5):
-            df_BED.iloc[i] = match.group(5)
-            result = False
-        elif not match.group(4):
+        if match.group(1) and match.group(2):
+            result = True
+        elif match.group(1):
             result = 'rs{}'.format(cur_val.strip())
+        else:
+            result = np.NaN
         return result
 
     def chr_check(result=True):
@@ -215,7 +203,7 @@ def check_vals(df, head):
 
     def effect_type():
         # removed the head == 'effect' check
-        size = (df.shape[0]) / 2
+        size = df.size
         # if zero negative values are found, it is certain the effect sizes are odd ratio's
         # but a small number of effect sizes may be negative due to a programmatic error
         if (neg_values/size) < 0.0005:
@@ -239,10 +227,9 @@ def check_vals(df, head):
         row_errors[str(i)] = row_errors.get(str(i), 0) + 1
 
     # corresponding check functions for the individual headers
-    check_funcs = {'SNP': rs_check, 'CHR': chr_check, 'BP': bp_check, 'A1': allele_check,
-                   'A2': allele_check, 'FRQ1': freq_check, 'FRQ2': freq_check,
-                   'Effect': effect_check, 'P': pval_check, 'SE': se_check, 'Info':
-                   info_check, 'Control': sample_control_check, 'Case': sample_control_check}
+    check_funcs = {'SNP': rs_check, 'CHR': chr_check, 'BP': bp_check, 'A1': allele_check, 'A2': allele_check,
+                   'FRQ1': freq_check, 'Effect': effect_check, 'P': pval_check, 'SE': se_check,
+                   'Info': info_check, 'Control': sample_control_check, 'Case': sample_control_check}
 
     head_operation()
     # get the specific pattern for the column type for dic 'col_types'
@@ -275,9 +262,8 @@ def check_vals(df, head):
 
     return df, head
 
-"""note to self: correct chromosome check concerning chr 23(X|Y)
-   remove allele2 frequency
+"""note to self:
+    correct chromosome check concerning chr 23(X|Y)
    remove bed file column, make NaN value, catch exception later on
    check order of headers
-   complete meta data json file operations
 """

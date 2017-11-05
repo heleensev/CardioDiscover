@@ -5,19 +5,19 @@ from GWASParse import glob
 df_buffer = dict()
 filename = str()
 logger = logging.getLogger(__name__)
-all_files = ["cad.add.160614.complete.website.txt","HTN_all_ethnic.csv", "tag.cpd.table.txt"]
+all_files = ["cad.add.160614.complete.website.txt", "HTN_all_ethnic.csv", "tag.cpd.table.txt"]
 
-def init_reader(this_study):
+def init_reader(study):
     logger.info("Entering read_GWAS")
     # call input_prompt for user input
     #selected_file = input_prompt()
     #sep = check_sep(selected_file)
-    study_path = this_study.study_path
-    sep = check_sep(study_path)
-    # new UncheckedFile object, with path and seperator as attributes
-    GWASin = glob.UncheckedFile(study_path, sep)
+    path  = study.get_path()
+    sep = check_sep(path)
+    # update studyID doc with seperator
+    study.update({'sep': sep})
 
-    return GWASin
+    return study
 
 
 def get_path(fdir, fpath):
