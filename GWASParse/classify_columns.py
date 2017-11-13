@@ -1,12 +1,12 @@
 # Module for automatic check on datatypes in the individual columns
 import re, logging
 import GWASParse.usr_classify_columns as usr_check
-from DataFrameHandler.config import file_to_dataframe
+from DataFrameHandler import chunker
 
 logger = logging.getLogger(__name__)
+studyID = str
 path = str
 sep = str
-header_num = int()
 identical = 0
 
 col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?\d+)|'
@@ -23,20 +23,23 @@ col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?
              ['Info', '(info)|(imputation)|(variance)', '(\d)*(\.)(\d)*(E)?(-)?(\d)*']]
 
 
-def init_classifier(study):
-    global path, sep
+def init_classifier(this_study):
+    global path, sep, studyID
+    # set the global to given study (this_study) file object
+    study = this_study
     path = study.get('path')
     sep = study.get('sep')
-    headers, dispose = header_IDer()
+    studyID = study.get('studyID')
+
+    headers, header_idx = header_IDer()
     check_essential(headers)
-    # set new attribute headers, and columns to skip
-    study.update({'headers': headers, 'skip': dispose})
+    # set new attribute headers, and indices of columns to keep
+    study.update({'headers': headers, 'header_idx': header_idx})
 
     return study
 
 
 def header_IDer():
-    global GWASin
     try:
         def allele_check():
             new_header = dup_vals_check('Allele', ['A1', 'A2'])
@@ -52,7 +55,7 @@ def header_IDer():
                 elif dup_vals[1] not in headers:
                     new_header = dup_vals[1]
                 else:
-                    raise ValueError    
+                    raise Exception('duplicate header found: {}'.format(header))
                 return new_header
 
         def duplicate_check(new_header):
@@ -69,38 +72,37 @@ def header_IDer():
             else:
                 return True
 
-        # transform first line of the csv to a DataFrame, to determine the headers
-        df = file_to_dataframe(path=path, sp=sep, ch=25)
+        # transform the csv to a DataFrame, to determine the headers
+        # get a chunk of the file to perform the check (for memory efficiency)
+        df = chunker.small_chunk(path=path, sep=sep)
         headers = df.columns.values.tolist()
-        global header_num
-        header_num = len(headers)
+
         dispose = list()
+        new_headers = list()
+        header_idx = list()
 
         # loop over all columns to determine the information type
         for i, header in enumerate(headers):
-            print(i)
-            # get a chunk of the column to perform the check (for memory efficiency)
             for c, col in enumerate(col_types):
                 if col_check(df, header, col[1], col[2]):
                     new_header = col[0]
                     # call duplicate check for duplicate headers
                     if new_header == 'Allele':
                         new_header = allele_check()
-                        headers[i] = new_header
+                        new_headers.append(new_header)
                         break
                     elif duplicate_check(new_header):
                         # replace old header in list with new header
-                        headers[i] = new_header
+                        new_headers.append(new_header)
                         # break loop when column is identified
                         break
+                    header_idx.append(i)
             else:
                 # if no valid header match found for the column, dispose column
-                dispose.append(i)
+                dispose.append(header)
+        logger.info('for study {}, disposed columns: {}'.format(studyID, ''.join(dispose)))
+        return new_headers, header_idx
 
-        return headers, dispose
-    except ValueError:
-        # if duplicate header is not allele, let user check the columns
-        check_essential([])
     except Exception as e:
         logger.error(e)
         check_essential([])
@@ -134,8 +136,7 @@ def col_check(df, header, rehead, recol, head=False, col=False, result=False):
 
 
 def check_essential(headers):
-    global GWASin
-    #required headers for the input GWAS file
+    # required headers for the input GWAS file
     required = ['SNP', 'CHR', 'BP', 'A1',
                 'A2', 'FRQ', 'Effect', 'P', 'SE']
     try:
@@ -151,8 +152,8 @@ def check_essential(headers):
         # if essential header is not identified, user input is required
         usr_headers = usr_check.init_usr_check(path)
         # after user input, check again for essential headers
-        check_essential(usr_headers, path)
+        check_essential(usr_headers)
     except Exception as e:
-        logger.error("")
+        logger.error(e)
 
     return headers

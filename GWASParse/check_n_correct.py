@@ -26,7 +26,7 @@ info_fixed = True
 
 # patterns for the individual columns that may be present in dataset
 col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
-             'CHR': '(\d){1,2}|[XY]',
+             'CHR': '(\d){1,2}|[XYMT]{1,2}',
              'BP': '\d{10}',
              'A1': '[ATCGRDI]+',
              'A2': '[ATCGRDI]+',
@@ -39,11 +39,10 @@ col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
              'Info': '(\d)*(\.)(\d)*(E)?(-)?(\d)*'}
 
 
-def init_check_correct(file, study):
-    global GWASin
+def init_check_correct(this_study):
     global study_size
+    study
     study_size = study.study_size
-    GWASin = file
     type_checker()
     # get additional meta data about study
     add_meta = get_meta_items()
@@ -105,7 +104,7 @@ def check_vals(df, head):
             effect_type()
 
     # specific check functions for column type in GWAS
-    def rs_check(result=True):
+    def rs_check():
         # check if rs prefix is present, if not, return concatenated value
         cur_val = val
         if match.group(1) and match.group(2):

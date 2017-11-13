@@ -1,4 +1,4 @@
-from SNPconformer import liftover, SNP1000ref
+from SNPconformer import liftover, reference_check
 from humantime import get_time
 import pandas as pd
 import logging, sys
@@ -14,7 +14,7 @@ def init_file_reader():
 
     # initiate collection object for querying the database
     liftover.init_collection()
-    SNP1000ref.init_collection()
+    reference_check.init_collection()
 
     # call read file, to initiate read, SNP liftover and reference check procedure
     read_file(GWAS, 5000)
@@ -34,7 +34,7 @@ def iterate_file(chnk_num, GWAS_chnk, GWAS_set, SNP='SNP', i=0):
     try:
         for i, _, _, SNP, BP, _, _, A1, A2, FRQ, effect, SE, P in GWAS_chnk:
             liftover.liftover_check(SNP, GWAS_set, chnk_num)
-            SNP1000ref.reference_check(SNP, BP, A1, A2, FRQ, effect, GWAS_set, chnk_num)
+            reference_check.reference_check(SNP, BP, A1, A2, FRQ, effect, GWAS_set, chnk_num)
     except:
         logger.error(sys.exc_info())
         logger.error('during parseRsmerge at chunk {}, at SNP {}, at row {}'.format(chnk_num, SNP, i))
@@ -44,5 +44,5 @@ def get_stats():
     # write stats about procedures to log file
     logger.info('number of liftovers: {}'.format(liftover.liftover_sum))
     logger.info('number of no hits in SNPArch: {}'.format(liftover.nohit_sum))
-    logger.info('number of no hits with 1000genome reference {}'.format(SNP1000ref.no_match_sum))
-    logger.info('number of switched alleles {}'.format(SNP1000ref.frq_switch_sum))
+    logger.info('number of no hits with 1000genome reference {}'.format(reference_check.no_match_sum))
+    logger.info('number of switched alleles {}'.format(reference_check.frq_switch_sum))

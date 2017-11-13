@@ -1,42 +1,65 @@
 
+
 # class containing info from meta data file as attributes
-class study:
+class Study:
 
     def __init__(self, studyID):
         self.studyID = studyID
-        self.study_path = str
+        self.path = str
         self.study_size = int
-        self.study_phenotype = str
-        self.study_sep = str
-        self.study_headers = list
-        self.study_num_variants = int
+        self.phenotype = str
+        self.ethnicity = str
+        self.chunksize = int
+        self.sep = str
+        self.headers = list
+        self.head_idx = list
+        self.num_variants = int
         self.study_lambda = float
-        self.study_correction = float
-        self.study_sum_eff = float
+        self.correction = float
+        self.sum_eff = float
 
     def set_path(self, path):
-        self.study_path = path
+        self.path = path
 
     def set_study_size(self, size):
         self.study_size = size
 
     def set_phenotype(self, pheno):
-        self.study_phenotype = pheno
+        self.phenotype = pheno
+
+    def set_ethnicity(self, eth):
+        self.ethnicity = eth
+
+    def set_chunksize(self, ch):
+        self.chunksize = ch
 
     def set_sep(self, sep):
-        self.study_sep = sep
+        self.sep = sep
 
     def set_headers(self, headers):
-        self.study_headers = headers
+        self.headers = headers
+
+    def set_indices(self, indices):
+        self.head_idx = indices
 
     def set_num_variants(self, num_var):
-        self.study_num_variants = num_var
+        self.num_variants = num_var
 
     def set_lambda(self, lb):
         self.study_lambda = lb
 
     def set_correction(self, cor):
-        self.study_correction = cor
+        self.correction = cor
 
     def set_sum_eff(self, eff):
-        self.study_sum_eff = eff
+        self.sum_eff = eff
+
+
+# run time preferences, given in meta data file
+class Preferences:
+
+    def __init__(self):
+        self.hpc = bool
+
+    def set_hpc(self, boolean):
+        self.hpc = boolean

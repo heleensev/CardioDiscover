@@ -1,47 +1,51 @@
 import simplejson as json
 import sys, copy, logging
 from json.decoder import JSONDecodeError
-from MetaReader.config import study
+from MetaReader.config import Study, Preferences
 
 logger = logging.getLogger(__name__)
 
 # required attributes, if not
-meta_req_attributes = {'path', 'size', 'phenotype'}
+meta_req_attributes = {'studyID', 'path', 'n_studies', 'phenotype'}
 
-meta_attributes = {'path': study.set_path, 'size': study.set_study_size, 'phenotype': study.set_phenotype,
-                   'sep': study.set_sep, 'headers': study.set_headers, 'num_variants': study.set_num_variants,
-                   'lambda': study.set_lambda, 'corr_factor': study.set_correction, 'sum_eff': study.set_sum_eff
-                   }
+meta_attributes = {'path': Study.set_path, 'n_studies': Study.set_study_size, 'phenotype': Study.set_phenotype,
+                   'separator': Study.set_sep, 'headers': Study.set_headers, 'chunk_size': Study.set_chunksize,
+                   'num_variants': Study.set_num_variants, 'lambda': Study.set_lambda,
+                   'ethnicity': Study.set_ethnicity, 'header_idx': Study.set_indices,
+                   'corr_factor': Study.set_correction, 'sum_eff': Study.set_sum_eff}
 
 
 def read_meta(path):
     try:
         with open(path) as json_file:
-            meta_file = json.load(json_file)
+            meta_json = json.load(json_file, encoding='utf-8')[0]
         # for all the studies in the meta data file
-        check_meta(meta_file)
-        return meta_file
+        study_info = meta_json.get('study_info')
+        pref_info = meta_json.get('preferences')
+        check_meta(study_info)
+        return study_info, pref_info
     except FileNotFoundError:
         print('study meta data file not found')
+        raise Exception
     except JSONDecodeError:
         print('problem loading meta data json file')
+        raise Exception
     except Exception as e:
         print(e)
-    finally:
         sys.exit(1)
 
 
 def check_meta(meta_file):
     try:
-        meta_keys = set(meta_file)
+        # all the unique keys from the meta (json) file
+        meta_keys = set([key for dic in meta_file for key in dic])
         # set with all the attributes that may be present in the meta file
-        all_attr = copy.deepcopy(meta_req_attributes)
-        set(all_attr).update(meta_keys)
-
+        all_attr = copy.deepcopy(set(meta_attributes))
+        all_attr.update(meta_req_attributes)
         # check if the required attributes are present in the file
-        if meta_req_attributes.difference(meta_keys):
+        if not set(meta_req_attributes).issubset(meta_keys):
             raise Exception('Required attributes: path, size, phenotype not present')
-        elif meta_keys.difference(all_attr):
+        elif not meta_keys.issubset(all_attr):
             raise Exception('Unexpected attributes present in file')
         return True
     except Exception as e:
@@ -49,19 +53,33 @@ def check_meta(meta_file):
         sys.exit(1)
 
 
+def set_preferences(pref_info):
+    options = {'hpc': Preferences.set_hpc}
+    prefs = Preferences()
+    for pref in pref_info:
+        if pref in options:
+            options.get(pref)(prefs, pref)
+    return prefs
+
+
 def meta_studies(path):
-    files = list()
+    studies = list()
     try:
-        meta_file = read_meta(path)
-        for studyID in meta_file:
-            this_study = study(studyID)
+        study_info, pref_info = read_meta(path)
+        prefs = set_preferences(pref_info)
+
+        for GWAS in study_info:
+            studyID = GWAS.get('studyID')
+            this_study = Study(studyID)
             for attr in meta_attributes:
-                study_param = studyID.get(attr)
-                if study_param:
-                    meta_attributes.get(attr)(this_study)
+                param = GWAS.get(attr)
+                # if study parameter is in meta file
+                if param:
+                    # call the setters for the parameters
+                    meta_attributes.get(attr)(this_study, param)
             # append study objects to a list
-            files.append(this_study)
+            studies.append(this_study)
         # return the list with study objects
-        return files
+        return studies, prefs
     except Exception as e:
         print(e)

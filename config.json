@@ -1,20 +1,33 @@
-{
-  'experimental GWAS':
+[
+  {
+  "preferences": 
+    {
+      "hpc": "no"
+    }
+  ,"study_info":
     [
       {
-        'path':
-       ,'n_studies':
-       ,'phenotype':
-       ,'ethnicity':
+        "studyID": "GWAS01"
+        ,"path": "../Datasets/HTN_all_ethnic.csv"
+        ,"n_studies": 1000
+        ,"phenotype": "HTN"
+        ,"ethnicity": "eur"
+        ,"chunk_size": 1000
+        ,"separator": ";"
+        ,"headers": ["SNP", "CHR", "BP", "A1", "A2", "FRQ", "Effect", "SE", "P"]
+        ,"header_idx": [2, 3, 4, 5, 6, 7, 8, 9, 10]
+      },
+      {
+        "studyID": "GWAS02"
+       ,"path": "../Datasets/tag.cpd.table.txt"
+       ,"n_studies": 1000
+       ,"phenotype": "TAG"
+       ,"ethnicity": "eur"
+       ,"chunk_size": 1000
+       ,"separator": "\t"
+       ,"headers": ["CHR", "SNP", "BP", "A1", "A2", "FRQ", "Info", "Effect", "SE", "P"]
+       ,"header_idx": [0, 1, 2, 3, 4, 5, 7, 8, 9, 10]
       }
     ]
-  'additional phenotype GWAS':
-  [
-    {
-      'path':
-     ,'n_studies':
-     ,'phenotype':
-     ,'ethnicity':
-    }
-  ]
-}
+  }
+]
