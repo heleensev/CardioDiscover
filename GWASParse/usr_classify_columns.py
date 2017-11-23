@@ -1,4 +1,5 @@
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 replacement_headers = {'additional info': 'info', 'strand orientation': 'strand', 'control samplesize': 'controls',
@@ -15,14 +16,14 @@ header_dict = {''}
 
 def init_usr_check(file):
     print("Automatic column parsing not succesful. Help me, human?")
-    skip = input("Skip column check? Y/N\n")
+    skip = input("Do column check? Y/N\n")
     while True:
         # if user chooses to skip the check, condition is false
         if skip.upper() == "N":
+            sys.exit(1)
+        elif skip.upper() == "Y":
             headers = column_unifier(file)
             return headers
-        elif skip.upper() == "Y":
-            return
         else:
             print("Y or N please\n")
 

@@ -1,36 +1,21 @@
-from UnqWrap import DbQuerier
 from timebuddy import get_time
+import redis
 import logging ,sys
 
-collection = DbQuerier.Collection
+snp_db = redis.StrictRedis(db=1)
 GWAS = ""
 liftover_sum = 0
 nohit_sum = 0
 logger = logging.getLogger(__name__)
 
-
-def init(df, study):
-    iterator()
-
-
-def iterator():
-    pass
-
-
-def init_collection():
-    global collection
-    collection = DbQuerier('../DB/GWAS').db_collection('SNPliftover')
-
-
 def liftover_check(SNP, gwas_set, chk_num):
-    global collection
     global liftover_sum, nohit_sum
     logger.info('initiating SNP conformer at {}'.format(get_time()))
 
     try:
-        match = collection.fetch('rs_low', SNP)
+        match = snp_db.execute_command('JSON.GET', SNP)
         if match:
-            entry = match[0]
+            entry = match.decode()
             rs_cur = entry.get('rs_cur')
             if rs_cur != SNP:
                 gwas_set.replace(SNP, rs_cur, inplace=True)
@@ -43,8 +28,3 @@ def liftover_check(SNP, gwas_set, chk_num):
     except:
         logger.error(sys.exc_info())
         logger.error('during liftover at chunk {}, at row {}'.format(chk_num, SNP))
-
-
-
-
-

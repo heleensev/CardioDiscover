@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def init_reader(study):
     logger.info("Entering read_GWAS")
-    path = study.get_path()
+    path = study.get('path')
     sep = check_sep(path)
     # update studyID doc with separator
     study.update({'sep': sep})

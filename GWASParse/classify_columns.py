@@ -11,9 +11,9 @@ identical = 0
 
 col_types = [['SNP', '(snp)|(marker[ -_]?(name)?)|(rs[ _-]?(id))', '((rs[ _-]?)?\d+)|'
               '((chr)?\d{1,2}\:(\d)+(:[ATCGDI])?)'],
-             ['CHR', '(ch(r)?(omosome)?)', '[1-22]|[XY]'],
+             ['CHR', '(ch(r)?(omosome)?)', '[1-26]|[XY]'],
              ['BP', '(pos)|(loc(ation)?)|(bp)|(hg(\d){2})|(grch(\d){2})', '\d+'],
-             ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGRDI]+($|(\s))'],
+             ['Allele', '(allele(s)?)?(A([12_-]|$))?[12]?', '[ACTGRDI1234]+($|(\s))'],
              ['FRQ', '([12][ _-]?)?fr(e)?q(uency)?([ _-]?[\w])?', '(\d)*(\.)(\d)*(E)?(-)?(\d)*'],
              ['Effect', '(beta)|(effect)|(OR)|odds[ _-]?ratio', '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
              ['SE', '(se)|(std(\w)*)|((standard( -_)?)?error)', '(\d)*(\.)(\d)*(E(-)?)?(\d)*'],
@@ -51,14 +51,14 @@ def header_IDer():
             # if the current column name from col_types in the loop matches Allele
             if col[0] == val:
                 if dup_vals[0] not in headers:
-                    new_header = dup_vals[0]
+                    new_head = dup_vals[0]
                 elif dup_vals[1] not in headers:
-                    new_header = dup_vals[1]
+                    new_head = dup_vals[1]
                 else:
                     raise Exception('duplicate header found: {}'.format(header))
-                return new_header
+                return new_head
 
-        def duplicate_check(new_header):
+        def duplicate_check():
             # if header is already in the headers list (for header in headers list except current header)
             # headers minus current evaluated value
             headers_min_cur = [x for n, x in enumerate(headers) if n != i]
@@ -91,7 +91,7 @@ def header_IDer():
                         new_header = allele_check()
                         new_headers.append(new_header)
                         break
-                    elif duplicate_check(new_header):
+                    elif duplicate_check():
                         # replace old header in list with new header
                         new_headers.append(new_header)
                         # break loop when column is identified
@@ -143,8 +143,8 @@ def check_essential(headers):
         for req in required:
             match = False
             for head in headers:
-                hdPattern = re.compile(r'{}'.format(req))
-                if hdPattern.match(head):
+                hd_pattern = re.compile(r'{}'.format(req))
+                if hd_pattern.match(head):
                     match = True
             if not match:
                 raise ValueError

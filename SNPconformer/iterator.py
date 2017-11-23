@@ -1,5 +1,5 @@
 from SNPconformer import liftover, reference_check
-from humantime import get_time
+from timebuddy import get_time
 import pandas as pd
 import logging, sys
 

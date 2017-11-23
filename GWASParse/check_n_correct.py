@@ -1,30 +1,32 @@
-#check datatypes in all columns, correct if necessary
+# check datatypes in all columns, correct if necessary
 import re, simplejson, logging
 import numpy as np
 import pandas as pd
 from MetaReader.writer import write_meta
-from GWASParse import glob
 
-""" GLOBALS """
+""" GLOBALS
+    df: chunked pandas dataframe from GWAS csv file
+    study: Study (see MetaReader.config) object containing meta data,
+    study_size: to compute a sum of the study,
+    eff_sum: sum of the effective size of study,
+    row_errors: dictionary of bad rows to be dropped,
+    neg_values: counter for the 'effect' column to determine if Beta/OR,
+    first_info: first row of 'effect' column to determine if effect is fixed,
+    info_fixed: bool for fixed effect
+    col_types: patterns for columns that may be present in data set
+"""
+
 logger = logging.getLogger(__name__)
-# study size to get a sum of the study effect
+
+df = object()
+study = object()
 study_size = int()
-# sum of effective size
 eff_sum = float()
-# object containing attrubutes of the input file
-GWASin = object()
-# counter for rows with issues, these are dropped from the set
 row_errors = dict()
-# counter for negative effect values, used to determine if effect
-# score is OR or Beta
 neg_values = int()
-# global variable for info value from first row, used to determine if
-# info score is fixed or not
 first_info = float()
-# boolean to determine if the info score is fixed
 info_fixed = True
 
-# patterns for the individual columns that may be present in dataset
 col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
              'CHR': '(\d){1,2}|[XYMT]{1,2}',
              'BP': '\d{10}',
@@ -39,39 +41,31 @@ col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
              'Info': '(\d)*(\.)(\d)*(E)?(-)?(\d)*'}
 
 
-def init_check_correct(this_study):
-    global study_size
-    study
+def init(this_df, this_study):
+
+    """
+    :param this_df: chunked pandas dataframe from GWAS csv
+    :param this_study: Study object with meta data as attributes
+    :return: checked and corrected dataframe
+
+    """
+    global df, study, study_size
+    df = this_df
+    study = this_study
     study_size = study.study_size
     type_checker()
     # get additional meta data about study
     add_meta = get_meta_items()
-    return add_meta
+
+    return df, add_meta
 
 
 def type_checker():
-    global GWASin
-    # get filename from old (UncheckedFile) file object
-    filename = GWASin.filename
-    # set headers in classify_columns
-    org_headers = GWASin.headers
-    # columns to skip in check and csv writing
-    disposed = GWASin.skip
-    print('disposed: {}'.format(disposed))
-    # create new file object, contains attributes for the processed output file
-    GWASout = glob.CheckedFile(filename, disposed)
-    # all column headers without disposed columns
-    headers = [x for i, x in enumerate(org_headers) if i not in disposed]
-    # for header in headers of GWASin except for the disposed columns
-    for head in headers:
-        n = org_headers.index(head)
-        df = GWASin.file_to_dfcol(head=head, cols=[n])
-        df, head = check_vals(df, head)
-        # write checked column to a temporary file
-        GWASout.write_to_file(df, head)
+    global study, df
 
-    # write temporary files (columns) to one csv file
-    GWASout.concat_write()
+    headers = study.headers
+    for i, header in enumerate(headers):
+        check_vals(df.groupby[i], header)
 
 
 def get_meta_items():
@@ -89,7 +83,7 @@ def get_meta_items():
 
 
 def check_vals(df, head):
-    global GWASin, row_errors
+    global study, row_errors
 
     def head_operation():
         global first_info
@@ -116,24 +110,17 @@ def check_vals(df, head):
         return result
 
     def chr_check(result=True):
-
-        """
-            if ( $fields[1] eq "X" ) { $chr[$study] = 23; }
-            elsif ( $fields[1] eq "Y" ) { $chr[$study] = 24; }
-            elsif ( $fields[1] eq "XY" ) { $chr[$study] = 25; }
-            elsif ( $fields[1] eq "MT" ) { $chr[$study] = 26; }
-            else { $chr[$study] = $fields[1]; }
-        """
-
+        # NCBI notation for X, Y, XY and MT
+        chr_map = {'X': '23', 'Y': '24', 'XY': '25', 'MT': '26'}
+        cur_val = val
+        if cur_val in chr_map:
+            cur_val = chr_map.get(cur_val)
+            return cur_val
         # check if autosomal chromosome number is no higher than 22
         global val
-        if isinstance(val, int) and val < 23:
-            result = True
-        elif int(val) == 23:
-            #replace with X/Y????
-            pass
-        else:
+        if not isinstance(val, int) and val < 23:
             result = False
+
         return result
 
     # check if human base pair number is no higher than 3,3 billion
@@ -145,21 +132,14 @@ def check_vals(df, head):
         return result
 
     def allele_check():
+        # old PLINK notation for alleles
+        plink_map = {'1': 'A', '2': 'C', '3': 'G', '4': 'T'}
         # multiple allele check?
-        """
-        ### Function to convert alleles encoding of 1/2/3/4 to A/C/G/T -- which is PLINK old-style
-        sub allele_1234_to_ACGT($)
-        {
-        	my $allele = shift;
-        	if ( $allele eq "1" ) { return "A"; }
-        	if ( $allele eq "2" ) { return "C"; }
-        	if ( $allele eq "3" ) { return "G"; }
-        	if ( $allele eq "4" ) { return "T"; }
-        	return $allele;
-        }
-        """
 
-        pass
+        cur_val = val
+        if cur_val in plink_map:
+            cur_val = plink_map.get(cur_val)
+
 
     def freq_check():
         # convert scientific notation to float?
@@ -259,10 +239,11 @@ def check_vals(df, head):
     # some operations to be done at end of the loop, depending on column type
     tail_operation()
 
-    return df, head
 
 """note to self:
     correct chromosome check concerning chr 23(X|Y)
    remove bed file column, make NaN value, catch exception later on
    check order of headers
+
+   look at the fixed effect stuff with Sander
 """

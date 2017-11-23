@@ -1,7 +1,7 @@
 from UnqWrap import DbModifier
 from UnqWrap import DbQuerier
 from SNPconformer.config import NoRefMatchException
-from humantime import get_time
+from timebuddy import get_time
 import logging, sys
 
 db = DbModifier
@@ -9,6 +9,14 @@ collection = DbQuerier.Collection
 frq_switch_sum = 0
 no_match_sum = 0
 logger = logging.getLogger(__name__)
+
+
+def init(df, study):
+    iterator()
+
+
+def iterator():
+    pass
 
 
 def init_collection():

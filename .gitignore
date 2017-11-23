@@ -108,3 +108,11 @@ ENV/
 /Datasets/Parser/GWAS/cad.add.160614.complete.website.txt
 /App/cad_rs.csv
 /home/sevvy/PycharmProjects/CardioDiscover/Datasets/Parser/Tempfiles/
+/Temp/
+
+# not part of project
+/Dasktest/
+
+# small files
+test_config.json
+main_worker.py

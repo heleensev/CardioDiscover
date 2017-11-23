@@ -8,7 +8,7 @@
     [
       {
         "studyID": "GWAS01"
-        ,"path": "../Datasets/HTN_all_ethnic.csv"
+        ,"path": "/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Parser/GWAS/HTN_all_ethnic.csv"
         ,"n_studies": 1000
         ,"phenotype": "HTN"
         ,"ethnicity": "eur"
@@ -19,7 +19,7 @@
       },
       {
         "studyID": "GWAS02"
-       ,"path": "../Datasets/tag.cpd.table.txt"
+       ,"path": "/home/sevvy/PycharmProjects/CardioDiscover/Datasets/Parser/GWAS/tag.cpd.table.txt"
        ,"n_studies": 1000
        ,"phenotype": "TAG"
        ,"ethnicity": "eur"

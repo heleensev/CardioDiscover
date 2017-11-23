@@ -1,11 +1,9 @@
-# main modules of CardioDiscover
+# local package for file chunking
 from DataFrameHandler import chunker
-from GWASParse import check_n_correct
-from SNPconformer import liftover
-from SNPconformer import reference_check
-
 # imports for meta data handling
 from MetaReader.reader import meta_studies
+# local module for generating bash scripts for qsub
+from GWASreader import gen_bash, local_run
 
 
 def main():
@@ -15,22 +13,12 @@ def main():
 
     for study in studies:
         # read the file to a pandas dataframe, get params from study object
-        chunker.init(study)
+        chunker.init(study, pickle=True)
     if prefs.hpc:
-        gen_bash()
+        gen_bash.run(studies)
     else:
-        # what to do
+        #local_run.run()
         pass
-
-
-
-    # # check and correct the GWAS file
-    # study = check_n_correct.init_check_correct(study)
-    # # make iterator in liftover and 1000ref
-    # study = liftover.iterator()
-    # stuy = reference_check.iterator()
-    # study = ''
-    # #call the stuff
 
 # if __name__ == '__main__':
 #     # execute only if run as the entry point into the program

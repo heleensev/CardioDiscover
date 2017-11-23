@@ -6,19 +6,25 @@ from MetaReader.writer import write_meta
 
 
 def main():
-    # original doc containing the metadata
-    meta_doc = read_meta(path="/home/sevvy/PycharmProjects/CardioDiscover/config.json")
+
+    """ reads config.json containing the meta data, calls MetaReader to turn
+        this information into 'Study' objects,
+        loops over the Study objects to:
+        - read the GWAS data with read_GWAS,
+        - classify the columns in the GWAS data set
+        finally write additional info to config.json
+    """
+    meta_doc = read_meta(path="/home/sevvy/PycharmProjects/CardioDiscover/test_config.json")
 
     for study_doc in meta_doc:
-        # read the GWAS file, study doc update with separator for the columns
+        # doc updated separator for the columns
         study_doc = read_GWAS.init_reader(study_doc)
-        # identify the columns in the GWAS file, study doc updated with headers and indices
+        # updated doc with headers and indices
         study_doc = classify_columns.init_classifier(study_doc)
         # update original meta_doc with the new meta data
         meta_doc.update(study_doc)
-    # when done write doc with additional info to json config file
+    # write doc with additional info to json config file
     write_meta(meta_doc)
 
-# if __name__ == '__main__':
-#     # execute only if run as the entry point into the program
-main()
+if __name__ == '__main__':
+    main()

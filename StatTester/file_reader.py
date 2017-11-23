@@ -1,7 +1,7 @@
 import pandas as pd
 import simplejson as json
 import logging, sys
-from humantime import get_time
+from timebuddy import get_time
 from simplejson.scanner import JSONDecodeError
 from MetaReader.config import study
 from StatTester import stat_test

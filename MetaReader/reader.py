@@ -23,7 +23,7 @@ def read_meta(path):
         study_info = meta_json.get('study_info')
         pref_info = meta_json.get('preferences')
         check_meta(study_info)
-        return study_info, pref_info
+        return study_info[0], pref_info
     except FileNotFoundError:
         print('study meta data file not found')
         raise Exception
