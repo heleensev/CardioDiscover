@@ -8,6 +8,7 @@ liftover_sum = 0
 nohit_sum = 0
 logger = logging.getLogger(__name__)
 
+
 def liftover_check(SNP, gwas_set, chk_num):
     global liftover_sum, nohit_sum
     logger.info('initiating SNP conformer at {}'.format(get_time()))

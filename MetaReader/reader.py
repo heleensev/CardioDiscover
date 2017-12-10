@@ -10,7 +10,7 @@ meta_req_attributes = {'studyID', 'path', 'n_studies', 'phenotype'}
 
 meta_attributes = {'path': Study.set_path, 'n_studies': Study.set_study_size, 'phenotype': Study.set_phenotype,
                    'separator': Study.set_sep, 'headers': Study.set_headers, 'chunk_size': Study.set_chunksize,
-                   'num_variants': Study.set_num_variants, 'lambda': Study.set_lambda,
+                   'num_variants': Study.set_num_variants, 'lambda': Study.set_lambda, 'build': Study.set_build,
                    'ethnicity': Study.set_ethnicity, 'header_idx': Study.set_indices,
                    'corr_factor': Study.set_correction, 'sum_eff': Study.set_sum_eff}
 
@@ -23,7 +23,7 @@ def read_meta(path):
         study_info = meta_json.get('study_info')
         pref_info = meta_json.get('preferences')
         check_meta(study_info)
-        return study_info[0], pref_info
+        return meta_json, study_info, pref_info
     except FileNotFoundError:
         print('study meta data file not found')
         raise Exception
@@ -65,7 +65,7 @@ def set_preferences(pref_info):
 def meta_studies(path):
     studies = list()
     try:
-        study_info, pref_info = read_meta(path)
+        _, study_info, pref_info = read_meta(path)
         prefs = set_preferences(pref_info)
 
         for GWAS in study_info:

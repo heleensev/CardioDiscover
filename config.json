@@ -12,6 +12,7 @@
         ,"n_studies": 1000
         ,"phenotype": "HTN"
         ,"ethnicity": "eur"
+        ,"build": "19"
         ,"chunk_size": 1000
         ,"separator": ";"
         ,"headers": ["SNP", "CHR", "BP", "A1", "A2", "FRQ", "Effect", "SE", "P"]
@@ -23,6 +24,7 @@
        ,"n_studies": 1000
        ,"phenotype": "TAG"
        ,"ethnicity": "eur"
+       ,"build": "19"
        ,"chunk_size": 1000
        ,"separator": "\t"
        ,"headers": ["CHR", "SNP", "BP", "A1", "A2", "FRQ", "Info", "Effect", "SE", "P"]

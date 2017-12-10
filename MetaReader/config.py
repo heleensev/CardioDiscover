@@ -9,6 +9,7 @@ class Study:
         self.study_size = int
         self.phenotype = str
         self.ethnicity = str
+        self.build = int
         self.chunksize = int
         self.sep = str
         self.headers = list
@@ -29,6 +30,9 @@ class Study:
 
     def set_ethnicity(self, eth):
         self.ethnicity = eth
+
+    def set_build(self, build):
+        self.build = build
 
     def set_chunksize(self, ch):
         self.chunksize = ch

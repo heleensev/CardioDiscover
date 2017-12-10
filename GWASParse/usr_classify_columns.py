@@ -66,7 +66,6 @@ def column_unifier(file):
     return new_headers
 
 
-
 def print_table():
     global header_info
 

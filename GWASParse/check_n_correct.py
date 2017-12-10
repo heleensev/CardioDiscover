@@ -18,27 +18,27 @@ from MetaReader.writer import write_meta
 
 logger = logging.getLogger(__name__)
 
-df = object()
-study = object()
-study_size = int()
-eff_sum = float()
-row_errors = dict()
-neg_values = int()
-first_info = float()
+df = object
+study = object
+study_size = int
+row_errors = dict
+neg_values = int
+first_info = float
 info_fixed = True
 
-col_types = {'SNP': '((rs[ _-]?)?\d+)|(.*)',
+col_types = {'SNP': '((rs[ _-]?)?\d+)|'
+                    '((chr)?\d{1,2}\:(\d)+)',
              'CHR': '(\d){1,2}|[XYMT]{1,2}',
              'BP': '\d{10}',
              'A1': '[ATCGRDI]+',
              'A2': '[ATCGRDI]+',
-             'FRQ': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
-             'Effect': '(-)?(\d)*(\.)(\d)*(E(-)?)?(\d)*',
-             'SE': '(\d)*(\.)(\d)*(E(-)?)?(\d)*',
-             'P': '(\d)*(\.)(\d)*(E)?(-)?(\d)',
+             'FRQ': '[\d.]+(?:e-?\d+)?',
+             'Effect': '-?[\d.]+(?:e-?\d+)?',
+             'SE': '-?[\d.]+(?:e-?\d+)?',
+             'P': '-?[\d.]+(?:e-?\d+)?',
              'Case': '[0-1000000]',
              'Control': '[0-1000000]',
-             'Info': '(\d)*(\.)(\d)*(E)?(-)?(\d)*'}
+             'Info': '-?[\d.]+(?:e-?\d+)?'}
 
 
 def init(this_df, this_study):
@@ -53,19 +53,20 @@ def init(this_df, this_study):
     df = this_df
     study = this_study
     study_size = study.study_size
-    type_checker()
+    # call iterate_columns
+    iterate_columns()
     # get additional meta data about study
     add_meta = get_meta_items()
 
     return df, add_meta
 
 
-def type_checker():
+def iterate_columns():
     global study, df
 
     headers = study.headers
     for i, header in enumerate(headers):
-        check_vals(df.groupby[i], header)
+        check_n_correct(df[header], header)
 
 
 def get_meta_items():
@@ -82,7 +83,7 @@ def get_meta_items():
     return {'info_score': info, 'sum_effective_size': eff_sum}
 
 
-def check_vals(df, head):
+def check_n_correct(df, head):
     global study, row_errors
 
     def head_operation():
@@ -100,16 +101,19 @@ def check_vals(df, head):
     # specific check functions for column type in GWAS
     def rs_check():
         # check if rs prefix is present, if not, return concatenated value
-        cur_val = val
         if match.group(1) and match.group(2):
             result = True
         elif match.group(1):
-            result = 'rs{}'.format(cur_val.strip())
+            result = 'rs{}'.format(match.group(1))
+        elif match.group(3):
+            # call snp_lookup
+            pass
         else:
             result = np.NaN
         return result
 
     def chr_check(result=True):
+        global val
         # NCBI notation for X, Y, XY and MT
         chr_map = {'X': '23', 'Y': '24', 'XY': '25', 'MT': '26'}
         cur_val = val
@@ -117,7 +121,7 @@ def check_vals(df, head):
             cur_val = chr_map.get(cur_val)
             return cur_val
         # check if autosomal chromosome number is no higher than 22
-        global val
+
         if not isinstance(val, int) and val < 23:
             result = False
 
@@ -131,15 +135,16 @@ def check_vals(df, head):
             result = False
         return result
 
-    def allele_check():
+    def allele_check(result=True):
         # old PLINK notation for alleles
         plink_map = {'1': 'A', '2': 'C', '3': 'G', '4': 'T'}
         # multiple allele check?
-
         cur_val = val
         if cur_val in plink_map:
             cur_val = plink_map.get(cur_val)
+            result = cur_val
 
+        return result
 
     def freq_check():
         # convert scientific notation to float?
@@ -159,6 +164,9 @@ def check_vals(df, head):
 
     def se_check():
         # convert scientific notation to float?
+        """        ### put BETA and SE on same scale across studies and correct SE for inflation
+        $beta[$study] = $beta[$study] / $correction_factor[$study];
+        $se[$study] = $se[$study] * sqrt($lambda[$study]) / $correction_factor[$study];"""
         return True
 
     def sample_control_check():
@@ -172,8 +180,8 @@ def check_vals(df, head):
         else:
             ratio = 1
         sample_size_eff = float(study_size * ratio)
-        eff_sum += sample_size_eff
-
+        #eff_sum += sample_size_eff
+        eff_sum = sample_size_eff
         # if the info value is not the same as the one from the first row, change bool
         if (val != first_info) and info_fixed:
             info_fixed = False
@@ -191,10 +199,10 @@ def check_vals(df, head):
                             'a small number of negative effect values were found: < 0.5%\n'
                             'these were converted to positive numbers and converted to Beta')
             # iterate effect sizes and convert to beta by taking the natural logarithm
-            for i, (row, val) in enumerate(df.itertuples()):
+            for i, (row, val) in enumerate(df.iteritems()):
                 if val < 0:
                     val *= -1
-                df.replace(val, np.log(float(val)), regex=True, inplace=True)
+                df.iloc[i] = np.log(float(val))
         elif 0.0005 < (neg_values/size) < 0.3:
             logger.info('check your effect size, very few negative numbers for Beta values\n'
                         'were found: < 30%')
@@ -213,7 +221,7 @@ def check_vals(df, head):
     head_operation()
     # get the specific pattern for the column type for dic 'col_types'
     pattern = col_types.get(head)
-    for i, (row, val) in enumerate(df.itertuples()):
+    for i, (row, val) in enumerate(df.iteritems()):
         val = str(val)
         # value may start or end with white space, case insensitive
         valPattern = re.compile(r'(\s|^)({})(\s|$)'.format(pattern), re.I)
@@ -231,10 +239,10 @@ def check_vals(df, head):
                 # if no new value is returned, but passed is True, continue to the next item in loop
                 elif not isinstance(passed, str):
                     continue
-            df.replace(val, passed, inplace=True)
+            df.iloc[i] = passed
         else:
             # if not matched with general pattern, set value to NaN
-            df.replace(val, str(np.NaN), inplace=True)
+            df.iloc[i] = str(np.NaN)
             row_errors_append()
     # some operations to be done at end of the loop, depending on column type
     tail_operation()
